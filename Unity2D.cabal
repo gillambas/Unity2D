@@ -1,0 +1,110 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           Unity2D
+version:        0.1.0.0
+synopsis:       Unity 2D roguelike tutorial using APECS.
+description:    Please see the README on GitHub at <https://github.com/githubuser/Unity2D#readme>
+category:       Game
+homepage:       https://github.com/githubuser/Unity2D#readme
+bug-reports:    https://github.com/githubuser/Unity2D/issues
+author:         George Illambas
+maintainer:     gillambas@gmail.com
+copyright:      2021 George Illambas
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/Unity2D
+
+library
+  exposed-modules:
+      Components
+      EventHandling
+      Step
+      Systems.Getters
+      Systems.Initialise
+      Systems.Removers
+      Visualise.Animations
+      Visualise.Draw
+      Visualise.Load
+      Visualise.Tools
+  other-modules:
+      Paths_Unity2D
+  hs-source-dirs:
+      src
+  default-extensions:
+      NamedFieldPuns
+      ScopedTypeVariables
+      TypeApplications
+  build-depends:
+      JuicyPixels
+    , JuicyPixels-extra
+    , apecs
+    , apecs-gloss
+    , base >=4.7 && <5
+    , containers
+    , extra
+    , gloss-juicy
+    , linear
+    , random
+  default-language: Haskell2010
+
+executable Unity2D-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_Unity2D
+  hs-source-dirs:
+      app
+  default-extensions:
+      NamedFieldPuns
+      ScopedTypeVariables
+      TypeApplications
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      JuicyPixels
+    , JuicyPixels-extra
+    , Unity2D
+    , apecs
+    , apecs-gloss
+    , base >=4.7 && <5
+    , containers
+    , extra
+    , gloss-juicy
+    , linear
+    , random
+  default-language: Haskell2010
+
+test-suite Unity2D-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_Unity2D
+  hs-source-dirs:
+      test
+  default-extensions:
+      NamedFieldPuns
+      ScopedTypeVariables
+      TypeApplications
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      JuicyPixels
+    , JuicyPixels-extra
+    , Unity2D
+    , apecs
+    , apecs-gloss
+    , base >=4.7 && <5
+    , containers
+    , extra
+    , gloss-juicy
+    , linear
+    , random
+  default-language: Haskell2010
