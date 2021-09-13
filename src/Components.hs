@@ -88,6 +88,7 @@ data PictureBundle = PictureBundle
   , fruitPic             :: AG.Picture
   , intactInnerWallPics  :: Map.Map InnerWall AG.Picture 
   , outerWallPics        :: Map.Map OuterWall AG.Picture
+  , playerAttackPics     :: [AG.Picture]
   , playerIdlePics       :: [AG.Picture]
   , sodaPic              :: AG.Picture
   , vampireIdlePics      :: [AG.Picture]
@@ -136,9 +137,9 @@ instance Component CFood where type Storage CFood = Map CFood
 newtype CInnerWall = CInnerWall InnerWall deriving (Show) 
 instance Component CInnerWall where type Storage CInnerWall = Map CInnerWall
 
-newtype CLevel = CLevel Int deriving (Show)
-instance Semigroup CLevel where (<>) (CLevel l1) (CLevel l2) = CLevel (l1+l2)
-instance Monoid CLevel where mempty = CLevel 0
+newtype CLevel = CLevel Int deriving (Show, Num)
+instance Semigroup CLevel where (<>) = (+)
+instance Monoid CLevel where mempty = 0
 instance Component CLevel where type Storage CLevel = Global CLevel 
 
 newtype COuterWall = COuterWall OuterWall deriving (Show) 
@@ -167,9 +168,10 @@ instance Component CHealth where type Storage CHealth = Map CHealth
 
 -- | Representation of an animation using sprites.
 data CAnimation = CAnimation 
-  { period  :: Float        -- ^ Time (in seconds) to pass until sprite changes.
-  , sprites :: [AG.Picture] -- ^ The sprites comprising the animation.
-  , index   :: Int          -- ^ Index of the current sprite. Usually initialised to 0 and kept between 0 and length sprites - 1.
+  { period   :: Float        -- ^ Time (in seconds) to pass until sprite changes.
+  , sprites  :: [AG.Picture] -- ^ The sprites comprising the animation.
+  , index    :: Int          -- ^ Index of the current sprite. Usually initialised to 0 and kept between 0 and length sprites - 1.
+  , isFinite :: Bool         -- ^ Is the animation finite (play once and done) or infinite (play forever).
   }
 
 instance Component CAnimation where type Storage CAnimation = Map CAnimation
@@ -192,9 +194,23 @@ instance Component CNutrition where type Storage CNutrition = Map CNutrition
 ----------------------------------------------------------------------------------------------
 -----------------------                      WORLD                     -----------------------
 ----------------------------------------------------------------------------------------------
-makeWorld "World" [ ''CPosition, ''CEnemy, ''CExit, ''CFloor, ''CFood, ''CFoodPoints, ''CHealth
-                  , ''CInnerWall, ''CInnerWallPic, ''CLevel, ''CNutrition, ''COuterWall, ''CPlayer
-                  , ''CAnimation, ''CTime, ''AG.Camera]
+makeWorld "World"
+  [ ''CAnimation
+  , ''CFloor
+  , ''CFood
+  , ''CFoodPoints
+  , ''CEnemy
+  , ''CExit
+  , ''CHealth
+  , ''CInnerWall
+  , ''CInnerWallPic
+  , ''CLevel
+  , ''CNutrition
+  , ''COuterWall
+  , ''CPlayer
+  , ''CPosition
+  , ''CTime
+  , ''AG.Camera ]
 
 type System' a = System World a 
 ----------------------------------------------------------------------------------------------

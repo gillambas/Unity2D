@@ -25,10 +25,10 @@ main = do
     AG.play 
       AG.FullScreen 
       AG.white 
-      60 
+      60
       (Draw.draw boardPic config picBundle) 
-      EH.eventHandler 
-      Step.stepper
+      (EH.eventHandler picBundle) 
+      (Step.stepper picBundle)
 
 
 config = C.Config

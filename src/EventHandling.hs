@@ -5,27 +5,33 @@ where
 
 import System.Exit (exitSuccess)
 
-import qualified Apecs           as A
-import qualified Apecs.Gloss     as AG
-import qualified Apecs.System    as AS
-import qualified Linear          as L
+import qualified Apecs                as A
+import qualified Apecs.Gloss          as AG
+import qualified Apecs.System         as AS
+import qualified Linear               as L
 
-import qualified Components      as C
-import qualified Systems.Getters as SGet
+import qualified Components           as C
+import qualified Systems.Getters      as SGet
+import qualified Visualise.Animations as Anim
 
 
-eventHandler :: AG.Event -> C.System' ()
--- Move player
-eventHandler (AG.EventKey key@(AG.SpecialKey AG.KeyLeft ) AG.Down _ _) = movePlayer key
-eventHandler (AG.EventKey key@(AG.SpecialKey AG.KeyRight) AG.Down _ _) = movePlayer key
-eventHandler (AG.EventKey key@(AG.SpecialKey AG.KeyUp   ) AG.Down _ _) = movePlayer key
-eventHandler (AG.EventKey key@(AG.SpecialKey AG.KeyDown ) AG.Down _ _) = movePlayer key
+eventHandler :: C.PictureBundle -> AG.Event -> C.System' ()
+eventHandler picBundle event = 
+  case event of 
+    -- Move player
+    (AG.EventKey key@(AG.SpecialKey AG.KeyLeft ) AG.Down _ _) -> movePlayer key
+    (AG.EventKey key@(AG.SpecialKey AG.KeyRight) AG.Down _ _) -> movePlayer key
+    (AG.EventKey key@(AG.SpecialKey AG.KeyUp   ) AG.Down _ _) -> movePlayer key
+    (AG.EventKey key@(AG.SpecialKey AG.KeyDown ) AG.Down _ _) -> movePlayer key
 
--- Terminate game
-eventHandler (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _) = A.liftIO exitSuccess
+    -- Player attacks
+    (AG.EventKey key@(AG.SpecialKey AG.KeySpace) AG.Down _ _) -> A.cmap $ \C.CPlayer -> Anim.initPlayerAttackAnim picBundle
 
--- Unsupported key
-eventHandler _ = return ()
+    -- Terminate game
+    (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _) -> A.liftIO exitSuccess
+
+    -- Unsupported key
+    _ -> return ()
 
 
 movePlayer :: AG.Key -> C.System' ()

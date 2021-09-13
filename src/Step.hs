@@ -14,9 +14,11 @@ import qualified Visualise.Animations as Anim
 
 -- | Main stepping function combining all steppers.
 -- To be used with Apecs.Gloss.play.
-stepper :: Float -> C.System' ()
-stepper dT = do
+stepper :: C.PictureBundle -> Float -> C.System' ()
+stepper picBundle dT = do
   incrTime dT
+
+  Anim.overrideFiniteAnimations picBundle
 
   A.cmapM_ $ \anim -> 
     triggerEvery dT (C.period anim) 0.0 (A.cmap $ \anim -> Anim.stepAnimation anim)
@@ -24,7 +26,7 @@ stepper dT = do
   SRem.removeFood
   SRem.removeInnerWalls
   SRem.removeEnemies
-  
+
 
 -- | Run a system periodically.
 -- Copied from https://github.com/jonascarpay/apecs/blob/master/examples/Shmup.md.

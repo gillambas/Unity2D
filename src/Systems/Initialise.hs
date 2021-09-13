@@ -9,13 +9,13 @@ import Control.Monad    (replicateM)
 import Data.Tuple.Extra ((&&&))
 import Data.List        (zip4)
 
-import qualified Apecs          as A
-import qualified Data.Map       as Map
-import qualified Linear         as L
-import qualified System.Random  as R
+import qualified Apecs                as A
+import qualified Data.Map             as Map
+import qualified Linear               as L
+import qualified System.Random        as R
 
-import qualified Components     as C
-import qualified Visualise.Draw as Draw
+import qualified Components           as C
+import qualified Visualise.Animations as Anim
 
 
 ----------------------------------------------------------------------------------------------
@@ -26,12 +26,12 @@ import qualified Visualise.Draw as Draw
 initialise :: C.Config -> C.PictureBundle -> C.System' ()
 initialise 
   cfg@C.Config{C.bottomLeft, C.topRight, C.exitPosition, C.startPosition, C.foodPoints} 
-  picBundle@C.PictureBundle{C.playerIdlePics} = do 
+  picBundle = do 
 
   A.set A.global (C.CFoodPoints foodPoints)
   A.set A.global (C.CLevel 10) -- TODO: Start from level 0
 
-  A.newEntity_ (startPosition, C.CPlayer, C.CAnimation 0.25 playerIdlePics 0)
+  A.newEntity_ (startPosition, C.CPlayer, Anim.initPlayerIdleAnim picBundle)
   A.newEntity_ (exitPosition, C.CExit) 
 
   boardSetup bottomLeft topRight
@@ -130,7 +130,7 @@ setupScene'
   enemyTypes <- replicateM nEnemies R.randomIO
   let enemyPositions' = map C.CPosition enemyPositions
       enemyTypes'     = map C.CEnemy enemyTypes
-      animations      = map (Draw.enemyAnimation picBundle) enemyTypes 
+      animations      = map (Anim.initEnemyIdleAnim picBundle) enemyTypes 
       enemyLives      = replicate nEnemies (C.CHealth 4 2) -- TODO: Read from config
       enemies         = zip4 enemyPositions' enemyTypes' animations enemyLives
 

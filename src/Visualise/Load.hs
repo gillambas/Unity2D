@@ -4,7 +4,6 @@
 module Visualise.Load (
   createPictureBundle,
   -- TODO: Remove after testing.
-  loadPlayerAttack,
   loadPlayerHurt,
   loadVampireAttack,
   loadZombieAttack,
@@ -42,6 +41,7 @@ createPictureBundle = do
       intactWalls  = loadInnerWallsIntact spriteSheet
       outerWalls   = loadOuterWallTiles spriteSheet
       soda         = loadSoda spriteSheet
+      playerAttack = loadPlayerAttack spriteSheet
       playerIdle   = loadPlayerIdle spriteSheet
       vampireIdle  = loadVampireIdle spriteSheet
       zombieIdle   = loadZombieIdle spriteSheet
@@ -58,6 +58,7 @@ createPictureBundle = do
         , C.fruitPic             = fruit
         , C.intactInnerWallPics  = intactWalls'
         , C.outerWallPics        = outerWalls'
+        , C.playerAttackPics     = playerAttack
         , C.playerIdlePics       = playerIdle
         , C.sodaPic              = soda
         , C.vampireIdlePics      = vampireIdle 

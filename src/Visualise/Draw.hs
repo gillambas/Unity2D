@@ -1,7 +1,6 @@
 module Visualise.Draw ( 
   createBoardPicture,
-  draw,
-  enemyAnimation
+  draw
 )
 where
 
@@ -15,8 +14,8 @@ import qualified Visualise.Tools as VTools
 
 draw :: AG.Picture -> C.Config -> C.PictureBundle -> C.System' AG.Picture
 draw boardPic C.Config{C.foodPointsPosition} picBundle = do
-  player     <- AG.foldDraw $ \(C.CPlayer, pos, C.CAnimation _ sprites index) -> VTools.translate' (VTools.positionToCoords' pos) (sprites !! index)
-  enemies    <- AG.foldDraw $ \(C.CEnemy _, pos, C.CAnimation _ sprites index) -> VTools.translate' (VTools.positionToCoords' pos) (sprites !! index)
+  player     <- AG.foldDraw $ \(C.CPlayer, pos, C.CAnimation _ sprites index _) -> VTools.translate' (VTools.positionToCoords' pos) (sprites !! index)
+  enemies    <- AG.foldDraw $ \(C.CEnemy _, pos, C.CAnimation _ sprites index _) -> VTools.translate' (VTools.positionToCoords' pos) (sprites !! index)
   food       <- AG.foldDraw $ \(C.CFood f, pos) -> VTools.translate' (VTools.positionToCoords' pos) (foodPic f picBundle)
   innerWalls <- AG.foldDraw $ \(C.CInnerWall _, pic, life, pos) -> VTools.translate' (VTools.positionToCoords' pos) (innerWallPic pic life)
 
@@ -36,11 +35,6 @@ innerWallPic (C.CInnerWallPic intact damaged) (C.CHealth hp _) =
 foodPic :: C.Food -> C.PictureBundle -> AG.Picture
 foodPic C.Fruit = C.fruitPic
 foodPic C.Soda  = C.sodaPic
-
-
-enemyAnimation :: C.PictureBundle -> C.Enemy -> C.CAnimation
-enemyAnimation picBundle C.Vampire = C.CAnimation 0.25 (C.vampireIdlePics picBundle) 0
-enemyAnimation picBundle C.Zombie  = C.CAnimation 0.25 (C.zombieIdlePics picBundle) 0
 
 
 createBoardPicture :: C.Config -> C.PictureBundle -> C.System' AG.Picture
