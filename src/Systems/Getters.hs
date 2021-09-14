@@ -18,7 +18,7 @@ import qualified Components as C
 getAll
   :: forall a w m . (A.Get w m a, A.Members w m a)
   => A.SystemT w m [a]
-getAll = reverse <$> A.cfold (flip (:)) []
+getAll = reverse <$> A.cfold (flip (:)) []  -- TODO: Remove reverse?
 
 
 getEnemyPositions :: C.System' [C.CPosition]

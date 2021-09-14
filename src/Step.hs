@@ -14,11 +14,11 @@ import qualified Visualise.Animations as Anim
 
 -- | Main stepping function combining all steppers.
 -- To be used with Apecs.Gloss.play.
-stepper :: C.PictureBundle -> Float -> C.System' ()
-stepper picBundle dT = do
+stepper :: Float -> C.System' ()
+stepper dT = do
   incrTime dT
 
-  Anim.overrideFiniteAnimations picBundle
+  Anim.overrideFiniteAnimations
 
   A.cmapM_ $ \anim -> 
     triggerEvery dT (C.period anim) 0.0 (A.cmap $ \anim -> Anim.stepAnimation anim)
@@ -38,5 +38,7 @@ triggerEvery dT period phase sys = do
   when trigger $ void sys
 
 
+-- | Increment the time.
+-- Copied from https://github.com/jonascarpay/apecs/blob/master/examples/Shmup.md.
 incrTime :: Float -> C.System' ()
 incrTime dT = A.modify A.global $ \(C.CTime t) -> C.CTime (t+dT)

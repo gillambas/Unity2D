@@ -29,7 +29,7 @@ removeInnerWalls =
 removeFood :: C.System' ()
 removeFood =
   A.cmapM_ $ \(C.CPlayer, posP :: C.CPosition) -> 
-    A.cmapM_ $ \(C.CFood _, posF :: C.CPosition, C.CNutrition n, etyF) -> 
+    A.cmapM_ $ \(C.CNutrition n, posF :: C.CPosition, etyF) -> 
       when (posP == posF) $ do 
         A.modify A.global (\(C.CFoodPoints fp) -> C.CFoodPoints (fp + n))
         A.destroy etyF (A.Proxy @C.FoodComponents)

@@ -3,9 +3,6 @@
 {-# LANGUAGE Rank2Types #-}
 
 module Visualise.Tools (
-  -- * Sprite dimensions
-  spriteHeight,
-  spriteWidth,
   -- * Convenience wrappers
   fromDynamicImage',
   readImage',
@@ -27,16 +24,6 @@ import qualified Data.Maybe    as Maybe
 import qualified Linear        as L
 
 import qualified Components    as C
-
-
-----------------------------------------------------------------------------------------------
------------------------                SPRITE DIMENSIONS               -----------------------
-----------------------------------------------------------------------------------------------
--- | Width and height of sprites in the sheet Scavengers_SpriteSheet.png
-spriteWidth, spriteHeight :: Int
-spriteWidth  = 32 
-spriteHeight = 32
-----------------------------------------------------------------------------------------------
 
 
 ----------------------------------------------------------------------------------------------
@@ -109,5 +96,5 @@ positionToCoords (xOffset, yOffset) (cellWidth, cellHeight) (C.CPosition (L.V2 x
   , yOffset + fromIntegral y * fromIntegral cellHeight )
 
 
-positionToCoords' = positionToCoords (0.0, 0.0) (spriteWidth, spriteHeight)
+positionToCoords' = positionToCoords (0.0, 0.0) (C.spriteWidth, C.spriteHeight)
 ----------------------------------------------------------------------------------------------

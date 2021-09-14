@@ -15,8 +15,8 @@ import qualified Systems.Getters      as SGet
 import qualified Visualise.Animations as Anim
 
 
-eventHandler :: C.PictureBundle -> AG.Event -> C.System' ()
-eventHandler picBundle event = 
+eventHandler :: AG.Event -> C.System' ()
+eventHandler event =
   case event of 
     -- Move player
     (AG.EventKey key@(AG.SpecialKey AG.KeyLeft ) AG.Down _ _) -> movePlayer key
@@ -25,7 +25,7 @@ eventHandler picBundle event =
     (AG.EventKey key@(AG.SpecialKey AG.KeyDown ) AG.Down _ _) -> movePlayer key
 
     -- Player attacks
-    (AG.EventKey key@(AG.SpecialKey AG.KeySpace) AG.Down _ _) -> A.cmap $ \C.CPlayer -> Anim.initPlayerAttackAnim picBundle
+    (AG.EventKey key@(AG.SpecialKey AG.KeySpace) AG.Down _ _) -> A.cmapM $ \C.CPlayer -> Anim.initPlayerAttackAnim <$> A.get A.global
 
     -- Terminate game
     (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _) -> A.liftIO exitSuccess
@@ -40,7 +40,7 @@ movePlayer key = do
   innerWalls <- SGet.getInnerWallPositions
   outerWalls <- SGet.getOuterWallPositions 
 
-  let occupiedPositions = enemies <> outerWalls <> innerWalls
+  let occupiedPositions = enemies <> innerWalls <> outerWalls
       displacement = case key of 
         AG.SpecialKey AG.KeyLeft  -> C.CPosition $ L.V2 (-1) 0
         AG.SpecialKey AG.KeyRight -> C.CPosition $ L.V2 1 0 

@@ -10,7 +10,7 @@ module Visualise.Load (
 )
 where
 
-import Visualise.Tools (cropDynamicImage, fromDynamicImage', readImage', spriteHeight, spriteWidth)
+import Visualise.Tools (cropDynamicImage, fromDynamicImage', readImage')
 
 import qualified Apecs.Gloss   as AG
 import qualified Codec.Picture as CP
@@ -30,7 +30,7 @@ spriteSheetPath = "assets/sprites/Scavengers_SpriteSheet.png"
 ----------------------------------------------------------------------------------------------
 -----------------------                   LOAD IMAGES                  -----------------------
 ----------------------------------------------------------------------------------------------
-createPictureBundle :: IO C.PictureBundle
+createPictureBundle :: IO C.CPictureBundle
 createPictureBundle = do 
   spriteSheet <- loadSpriteSheet
 
@@ -51,7 +51,7 @@ createPictureBundle = do
       outerWalls'   = Map.fromList $ zip [minBound .. maxBound] outerWalls
       intactWalls'  = Map.fromList $ zip [minBound .. maxBound] intactWalls
 
-  let picBundle = C.PictureBundle
+  let picBundle = C.CPictureBundle
         { C.damagedInnerWallPics = damagedWalls'
         , C.exitPic              = exit
         , C.floorPics            = floor'
@@ -86,6 +86,28 @@ loadFloorTiles = loadPics'
   , (7, 4) ]
 
 
+loadFruit = loadPic' (3,2)
+
+
+loadInnerWallsDamaged = loadPics'
+  [ (0, 6)
+  , (1, 6)
+  , (2, 6)
+  , (3, 6)
+  , (4, 6)
+  , (5, 6) 
+  , (6, 6) ]
+
+loadInnerWallsIntact = loadPics'
+  [ (5, 2)
+  , (6, 2)
+  , (7, 2)
+  , (0, 3)
+  , (3, 3)
+  , (6, 3) 
+  , (7, 3) ]
+
+
 loadOuterWallTiles = loadPics' 
   [ (1, 3)
   , (2, 3)
@@ -96,11 +118,9 @@ loadPlayerAttack = loadPics'
   [ (0, 5)
   , (1, 5) ]
 
-
 loadPlayerHurt = loadPics' 
   [ (6, 5)
   , (7, 5) ]
-
 
 loadPlayerIdle = loadPics' 
   [ (0, 0)
@@ -111,9 +131,6 @@ loadPlayerIdle = loadPics'
   , (5, 0) ]
 
 
-loadFruit = loadPic' (3,2)
-
-
 loadSoda  = loadPic' (2,2)
 
 
@@ -121,7 +138,6 @@ loadVampireAttack = loadPics'
   [ (4, 5)
   , (5, 5) ]
   
-
 loadVampireIdle = loadPics' 
   [ (4, 1)
   , (5, 1)
@@ -135,7 +151,6 @@ loadZombieAttack = loadPics'
   [ (2, 5)
   , (3, 5) ]
 
-
 loadZombieIdle = loadPics'
   [ (6, 0)
   , (7, 0)
@@ -143,26 +158,6 @@ loadZombieIdle = loadPics'
   , (1, 1)
   , (2, 1)
   , (3, 1) ]
-
-
-loadInnerWallsIntact = loadPics'
-  [ (5, 2)
-  , (6, 2)
-  , (7, 2)
-  , (0, 3)
-  , (3, 3)
-  , (6, 3) 
-  , (7, 3) ]
-
-
-loadInnerWallsDamaged = loadPics'
-  [ (0, 6)
-  , (1, 6)
-  , (2, 6)
-  , (3, 6)
-  , (4, 6)
-  , (5, 6) 
-  , (6, 6) ]
 ----------------------------------------------------------------------------------------------
 
 
@@ -170,7 +165,7 @@ loadInnerWallsDamaged = loadPics'
 -----------------------                GENERAL FUNCTIONS               -----------------------
 ----------------------------------------------------------------------------------------------
 loadPic' :: (Int, Int) -> CP.DynamicImage -> AG.Picture 
-loadPic' = loadPic spriteWidth spriteHeight
+loadPic' = loadPic C.spriteWidth C.spriteHeight
 
 
 loadPic :: Int -> Int -> (Int, Int) -> CP.DynamicImage -> AG.Picture 
@@ -183,7 +178,7 @@ loadPic cellWidth cellHeight (row, col) img = croppedPic
 
 
 loadPics' :: [(Int, Int)] -> CP.DynamicImage -> [AG.Picture]
-loadPics' = loadPics spriteWidth spriteHeight
+loadPics' = loadPics C.spriteWidth C.spriteHeight
 
 
 loadPics :: Int -> Int -> [(Int, Int)] -> CP.DynamicImage -> [AG.Picture]
