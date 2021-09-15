@@ -29,6 +29,7 @@ module Components (
   COuterWall(..),
   CPictureBundle(..),
   CPlayer(..),
+  CPointsChange(..),
   CPosition(..),
   CTime(..),
   -- * Other Data Types
@@ -242,6 +243,12 @@ instance Component CPictureBundle where type Storage CPictureBundle = Global CPi
 data CPlayer = CPlayer deriving (Show) 
 instance Component CPlayer where type Storage CPlayer = Unique CPlayer
 
+-- CPointsChange
+newtype CPointsChange = CPointsChange String deriving (Show)
+instance Semigroup CPointsChange where (<>) (CPointsChange s1) (CPointsChange s2) = CPointsChange (s1 <> s2)
+instance Monoid CPointsChange where mempty = CPointsChange ""
+instance Component CPointsChange where type Storage CPointsChange = Global CPointsChange 
+
 -- CPosition
 newtype CPosition = CPosition Position 
   deriving (Eq, Show)
@@ -276,6 +283,7 @@ makeWorld "World"
   , ''COuterWall
   , ''CPictureBundle
   , ''CPlayer
+  , ''CPointsChange
   , ''CPosition
   , ''CTime
   , ''AG.Camera ]

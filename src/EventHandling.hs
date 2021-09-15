@@ -25,7 +25,7 @@ eventHandler event =
     (AG.EventKey key@(AG.SpecialKey AG.KeyDown ) AG.Down _ _) -> movePlayer key
 
     -- Player attacks
-    (AG.EventKey key@(AG.SpecialKey AG.KeySpace) AG.Down _ _) -> A.cmapM $ \C.CPlayer -> Anim.initPlayerAttackAnim <$> A.get A.global
+    (AG.EventKey key@(AG.SpecialKey AG.KeySpace) AG.Down _ _) -> playerAttack
 
     -- Terminate game
     (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _) -> A.liftIO exitSuccess
@@ -51,3 +51,17 @@ movePlayer key = do
   AS.cmapIf
     (\(pos, C.CFoodPoints fp) -> (pos + displacement) `notElem` occupiedPositions && fp > 0)
     (\(C.CPlayer, pos, C.CFoodPoints fp) -> (pos + displacement, C.CFoodPoints (fp-1)))
+
+
+playerAttack :: C.System' ()
+playerAttack = do 
+  A.cmapM $ \C.CPlayer -> Anim.initPlayerAttackAnim <$> A.get A.global
+  inflictDamage
+
+
+inflictDamage :: C.System' ()
+inflictDamage =
+  A.cmapM_ $ \(C.CPlayer, C.CPosition posP) ->
+    AS.cmapIf
+      (\(C.CPosition pos) -> posP + L.V2 1 0 == pos || posP + L.V2 0 1 == pos)
+      (\(h@(C.CHealth hp damage), A.Not :: A.Not C.CPlayer) -> h {C.hp = hp - damage} )

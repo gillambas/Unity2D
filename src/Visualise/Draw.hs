@@ -22,8 +22,10 @@ draw boardPic = do
   food       <- AG.foldDraw $ \(C.CFood f, pos) -> VTools.translate' (VTools.positionToCoords' pos) (foodPic f picBundle)
   innerWalls <- AG.foldDraw $ \(C.CInnerWall _, pic, health, pos) -> VTools.translate' (VTools.positionToCoords' pos) (innerWallPic pic health)
 
-  C.CFoodPoints fp <- A.get A.global
-  let foodPoints = AG.color AG.white . VTools.translate' (VTools.positionToCoords' (C.foodPointsPosition config)) . AG.scale 0.12 0.12 . AG.text $ "Food " <> show fp
+  C.CFoodPoints   fp <- A.get A.global
+  C.CPointsChange pc <- A.get A.global
+
+  let foodPoints = AG.color AG.white . VTools.translate' (VTools.positionToCoords' (C.foodPointsPosition config)) . AG.scale 0.12 0.12 . AG.text $ mconcat [pc, "Food: ", show fp]
   
   return $ mconcat [boardPic, food, enemies, innerWalls, player, foodPoints]
 

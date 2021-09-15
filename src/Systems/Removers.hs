@@ -32,4 +32,5 @@ removeFood =
     A.cmapM_ $ \(C.CNutrition n, posF :: C.CPosition, etyF) -> 
       when (posP == posF) $ do 
         A.modify A.global (\(C.CFoodPoints fp) -> C.CFoodPoints (fp + n))
+        A.set A.global $ C.CPointsChange (mconcat ["+", show n, "  "])
         A.destroy etyF (A.Proxy @C.FoodComponents)

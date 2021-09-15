@@ -23,9 +23,15 @@ stepper dT = do
   A.cmapM_ $ \anim -> 
     triggerEvery dT (C.period anim) 0.0 (A.cmap $ \anim -> Anim.stepAnimation anim)
 
+  triggerEvery dT 3.0 0.0 nullifyPointsChange
+
   SRem.removeFood
   SRem.removeInnerWalls
   SRem.removeEnemies
+
+
+nullifyPointsChange :: C.System' ()
+nullifyPointsChange = A.set A.global (mempty :: C.CPointsChange)
 
 
 -- | Run a system periodically.
