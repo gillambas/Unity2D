@@ -116,7 +116,7 @@ setupScene'
 
   -- Place inner walls.
   nInnerWalls <- R.randomRIO innerWallsRange
-  (innerWallPositions, occupiedPositions) <- randomPositions nInnerWalls minPosition maxPosition []
+  (innerWallPositions, occupiedPositions) <- randomUniques nInnerWalls minPosition maxPosition []
   innerWallTypes <- replicateM nInnerWalls R.randomIO
   let innerWallPositions' = map C.CPosition innerWallPositions
       innerWallTypes'     = map C.CInnerWall innerWallTypes
@@ -126,7 +126,7 @@ setupScene'
 
   -- Place food.
   nFood <- R.randomRIO foodRange
-  (foodPositions, occupiedPositions') <- randomPositions nFood minPosition maxPosition occupiedPositions
+  (foodPositions, occupiedPositions') <- randomUniques nFood minPosition maxPosition occupiedPositions
   foodTypes <- replicateM nFood R.randomIO
   let foodPositions' = map C.CPosition foodPositions
       foodTypes'     = map C.CFood foodTypes
@@ -136,7 +136,7 @@ setupScene'
 
   -- Place enemies.
   let nEnemies = ceiling $ logBase 2.0 (fromIntegral level)
-  (enemyPositions, _) <- randomPositions nEnemies minPosition maxPosition occupiedPositions'
+  (enemyPositions, _) <- randomUniques nEnemies minPosition maxPosition occupiedPositions'
   enemyTypes <- replicateM nEnemies R.randomIO
   let enemyPositions' = map C.CPosition enemyPositions
       enemyTypes'     = map C.CEnemy enemyTypes
@@ -149,30 +149,32 @@ setupScene'
 
 
 ----------------------------------------------------------------------------------------------
------------------------                RANDOM POSITIONS                -----------------------
+-----------------------         GENERATE UNIQUE RANDOM ELEMENTS        -----------------------
 ----------------------------------------------------------------------------------------------
--- | Generate n random positions which are within the rectangle formed by the given positions,
--- are different from the given list of positions and are different between them.
--- Returns the random positions generated and the list of positions updated to include the new positions.
-randomPositions :: Int -> C.Position -> C.Position -> [C.Position] -> IO ([C.Position], [C.Position])
-randomPositions n min max occupiedPositions = randomPositions' n min max ([], occupiedPositions)
+-- | Generate n random elements which are within the given range,
+-- are different from the given list of elements and are different between them.
+-- Returns the random elements generated and the list of elements updated to include the new elements.
+randomUniques :: (Eq a, R.Random a) => Int -> a -> a -> [a] -> IO ([a], [a])
+randomUniques n min max occupied = randomUniques' n min max ([], occupied)
 
 
-randomPositions' :: Int -> C.Position -> C.Position -> ([C.Position], [C.Position]) -> IO ([C.Position], [C.Position])
-randomPositions' 0 _ _ ls = return ls
-randomPositions' n min max (newPositions, occupiedPositions) = do
-  (newPosition, occupiedPositions') <- randomPosition min max occupiedPositions
-  randomPositions' (n-1) min max (newPosition : newPositions, occupiedPositions')
+randomUniques' :: (Eq a, R.Random a) => Int -> a -> a -> ([a], [a]) -> IO ([a], [a])
+randomUniques' n min max rs@(news, occupied) = 
+  if   n <= 0
+  then return rs
+  else do 
+    (new, occupied') <- randomUnique min max occupied
+    randomUniques' (n-1) min max (new : news, occupied')
 
 
--- | Generate a random position which is within the rectangle formed by the given positions
--- and is different from the given list of positions.
--- Returns the random position generated and the list of positions updated to include the new position.
-randomPosition :: C.Position -> C.Position -> [C.Position] -> IO (C.Position, [C.Position])
-randomPosition min max occupiedPositions = do
-  p <- R.randomRIO (min, max)
+-- | Generate a random element which is within the given range
+-- and is different from the given list of elements.
+-- Returns the random element generated and the list of element updated to include the new element.
+randomUnique :: (Eq a, R.Random a) => a -> a -> [a] -> IO (a, [a])
+randomUnique min max occupied = do
+  r <- R.randomRIO (min, max)
 
-  if   p `elem` occupiedPositions
-  then randomPosition min max occupiedPositions
-  else return (p, p:occupiedPositions)
+  if   r `elem` occupied
+  then randomUnique min max occupied
+  else return (r, r:occupied)
 ----------------------------------------------------------------------------------------------
