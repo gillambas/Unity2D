@@ -15,8 +15,8 @@ import qualified Components   as C
 
 
 initEnemyAttackAnim :: C.CPictureBundle -> C.Enemy -> C.CAnimation
-initEnemyAttackAnim picBundle C.Vampire = C.CAnimation 0.75 (C.vampireAttackPics picBundle) 0 True
-initEnemyAttackAnim picBundle C.Zombie  = C.CAnimation 0.75 (C.zombieAttackPics picBundle) 0 True
+initEnemyAttackAnim picBundle C.Vampire = C.CAnimation 0.5 (C.vampireAttackPics picBundle) 0 True
+initEnemyAttackAnim picBundle C.Zombie  = C.CAnimation 0.5 (C.zombieAttackPics picBundle) 0 True
 
 
 initEnemyIdleAnim :: C.CPictureBundle -> C.Enemy -> C.CAnimation
@@ -25,7 +25,7 @@ initEnemyIdleAnim picBundle C.Zombie  = C.CAnimation 0.25 (C.zombieIdlePics picB
 
 
 initPlayerAttackAnim :: C.CPictureBundle -> C.CAnimation
-initPlayerAttackAnim picBundle = C.CAnimation 0.75 (C.playerAttackPics picBundle) 0 True
+initPlayerAttackAnim picBundle = C.CAnimation 0.5 (C.playerAttackPics picBundle) 0 True
 
 
 initPlayerIdleAnim :: C.CPictureBundle -> C.CAnimation
