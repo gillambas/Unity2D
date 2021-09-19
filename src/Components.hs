@@ -31,6 +31,7 @@ module Components (
   CPlayer(..),
   CPointsChange(..),
   CPosition(..),
+  CSkipMove(..),
   CTime(..),
   -- * Other Data Types
   Enemy(..),
@@ -256,6 +257,12 @@ newtype CPosition = CPosition Position
 
 instance Component CPosition where type Storage CPosition = Map CPosition
 
+-- CSkipMove
+newtype CSkipMove = CSkipMove Bool deriving (Show)
+instance Semigroup CSkipMove where (<>) (CSkipMove s1) (CSkipMove s2) = CSkipMove (s1 && s2)
+instance Monoid CSkipMove where mempty = CSkipMove True
+instance Component CSkipMove where type Storage CSkipMove = Global CSkipMove 
+
 -- CTime
 newtype CTime = CTime Float deriving (Show, Num)
 instance Semigroup CTime where (<>) = (+)
@@ -285,6 +292,7 @@ makeWorld "World"
   , ''CPlayer
   , ''CPointsChange
   , ''CPosition
+  , ''CSkipMove
   , ''CTime
   , ''AG.Camera ]
 

@@ -32,6 +32,7 @@ library
       Step
       Systems.Getters
       Systems.Initialise
+      Systems.Movers
       Systems.Removers
       Visualise.Animations
       Visualise.Draw

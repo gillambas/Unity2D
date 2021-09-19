@@ -5,7 +5,8 @@ module Systems.Getters (
   getAll,
   getEnemyPositions,
   getInnerWallPositions,
-  getOuterWallPositions
+  getOuterWallPositions,
+  getPlayerPosition
 )
 where 
 
@@ -37,3 +38,9 @@ getOuterWallPositions :: C.System' [C.CPosition]
 getOuterWallPositions = do 
   outerWalls :: [(C.COuterWall, C.CPosition)] <- getAll 
   return $ map snd outerWalls
+
+
+getPlayerPosition :: C.System' C.CPosition
+getPlayerPosition = do
+  player :: [(C.CPlayer, C.CPosition)] <- getAll
+  return $ (snd . head) player
