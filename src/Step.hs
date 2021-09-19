@@ -8,6 +8,8 @@ import Control.Monad (void, when)
 import qualified Apecs                as A
 
 import qualified Components           as C
+import qualified Systems.Attack       as SAttack
+import qualified Systems.Move         as SMove
 import qualified Systems.Remove       as SRem
 import qualified Visualise.Animations as Anim
 
@@ -23,15 +25,14 @@ stepper dT = do
   A.cmapM_ $ \anim -> 
     triggerEvery dT (C.period anim) 0.0 (A.cmap $ \anim -> Anim.stepAnimation anim)
 
-  triggerEvery dT 3.0 0.0 nullifyPointsChange
+  triggerEvery dT 3.0 0.0 SRem.removePointsChange
+
+  triggerEvery dT 2.0 0.0 SMove.moveEnemy
+  triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
 
   SRem.removeFood
   SRem.removeInnerWalls
   SRem.removeEnemies
-
-
-nullifyPointsChange :: C.System' ()
-nullifyPointsChange = A.set A.global (mempty :: C.CPointsChange)
 
 
 -- | Run a system periodically.
