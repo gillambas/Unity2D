@@ -208,17 +208,19 @@ instance Component COuterWall where type Storage COuterWall = Map COuterWall
 
 -- CPictureBundle
 data CPictureBundle = CPictureBundle 
-  { damagedInnerWallPics :: Map.Map InnerWall AG.Picture 
-  , exitPic              :: AG.Picture
-  , floorPics            :: Map.Map Floor AG.Picture
-  , fruitPic             :: AG.Picture
-  , intactInnerWallPics  :: Map.Map InnerWall AG.Picture 
-  , outerWallPics        :: Map.Map OuterWall AG.Picture
-  , playerAttackPics     :: [AG.Picture]
-  , playerIdlePics       :: [AG.Picture]
-  , sodaPic              :: AG.Picture
-  , vampireIdlePics      :: [AG.Picture]
-  , zombieIdlePics       :: [AG.Picture]
+  { damagedInnerWallPics  :: Map.Map InnerWall AG.Picture 
+  , exitPic               :: AG.Picture
+  , floorPics             :: Map.Map Floor AG.Picture
+  , fruitPic              :: AG.Picture
+  , intactInnerWallPics   :: Map.Map InnerWall AG.Picture 
+  , outerWallPics         :: Map.Map OuterWall AG.Picture
+  , playerAttackPics      :: [AG.Picture]
+  , playerIdlePics        :: [AG.Picture]
+  , sodaPic               :: AG.Picture
+  , vampireAttackPics     :: [AG.Picture]
+  , vampireIdlePics       :: [AG.Picture]
+  , zombieAttackPics      :: [AG.Picture]
+  , zombieIdlePics        :: [AG.Picture]
   }
 
 instance Semigroup CPictureBundle where (<>) _ p = p
@@ -234,7 +236,9 @@ instance Monoid CPictureBundle where
     , playerAttackPics     = mempty
     , playerIdlePics       = mempty
     , sodaPic              = mempty
+    , vampireAttackPics    = mempty
     , vampireIdlePics      = mempty
+    , zombieAttackPics     = mempty
     , zombieIdlePics       = mempty
     }
 

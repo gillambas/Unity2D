@@ -5,8 +5,6 @@ module Visualise.Load (
   createPictureBundle,
   -- TODO: Remove after testing.
   loadPlayerHurt,
-  loadVampireAttack,
-  loadZombieAttack,
 )
 where
 
@@ -34,17 +32,19 @@ createPictureBundle :: IO C.CPictureBundle
 createPictureBundle = do 
   spriteSheet <- loadSpriteSheet
 
-  let damagedWalls = loadInnerWallsDamaged spriteSheet
-      exit         = loadExit spriteSheet
-      floor        = loadFloorTiles spriteSheet
-      fruit        = loadFruit spriteSheet
-      intactWalls  = loadInnerWallsIntact spriteSheet
-      outerWalls   = loadOuterWallTiles spriteSheet
-      soda         = loadSoda spriteSheet
-      playerAttack = loadPlayerAttack spriteSheet
-      playerIdle   = loadPlayerIdle spriteSheet
-      vampireIdle  = loadVampireIdle spriteSheet
-      zombieIdle   = loadZombieIdle spriteSheet
+  let damagedWalls  = loadInnerWallsDamaged spriteSheet
+      exit          = loadExit spriteSheet
+      floor         = loadFloorTiles spriteSheet
+      fruit         = loadFruit spriteSheet
+      intactWalls   = loadInnerWallsIntact spriteSheet
+      outerWalls    = loadOuterWallTiles spriteSheet
+      soda          = loadSoda spriteSheet
+      playerAttack  = loadPlayerAttack spriteSheet
+      playerIdle    = loadPlayerIdle spriteSheet
+      vampireAttack = loadVampireAttack spriteSheet
+      vampireIdle   = loadVampireIdle spriteSheet
+      zombieAttack  = loadZombieAttack spriteSheet
+      zombieIdle    = loadZombieIdle spriteSheet
 
   let damagedWalls' = Map.fromList $ zip [minBound .. maxBound] damagedWalls
       floor'        = Map.fromList $ zip [minBound .. maxBound] floor
@@ -61,7 +61,9 @@ createPictureBundle = do
         , C.playerAttackPics     = playerAttack
         , C.playerIdlePics       = playerIdle
         , C.sodaPic              = soda
+        , C.vampireAttackPics    = vampireAttack
         , C.vampireIdlePics      = vampireIdle 
+        , C.zombieAttackPics     = zombieAttack
         , C.zombieIdlePics       = zombieIdle
         }
 

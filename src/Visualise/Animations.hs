@@ -1,4 +1,5 @@
 module Visualise.Animations (
+  initEnemyAttackAnim,
   initEnemyIdleAnim,
   initPlayerAttackAnim,
   initPlayerIdleAnim,
@@ -11,6 +12,11 @@ import qualified Apecs        as A
 import qualified Apecs.System as AS
 
 import qualified Components   as C
+
+
+initEnemyAttackAnim :: C.CPictureBundle -> C.Enemy -> C.CAnimation
+initEnemyAttackAnim picBundle C.Vampire = C.CAnimation 0.75 (C.vampireAttackPics picBundle) 0 True
+initEnemyAttackAnim picBundle C.Zombie  = C.CAnimation 0.75 (C.zombieAttackPics picBundle) 0 True
 
 
 initEnemyIdleAnim :: C.CPictureBundle -> C.Enemy -> C.CAnimation
