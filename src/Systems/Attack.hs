@@ -4,6 +4,8 @@ module Systems.Attack (
 )
 where 
 
+import Control.Monad (when)
+
 import qualified Apecs                as A
 import qualified Apecs.System         as AS
 import qualified Linear               as L
@@ -14,10 +16,12 @@ import qualified Visualise.Animations as Anim
 
 enemiesAttack :: C.System' ()
 enemiesAttack =
-  A.cmapM_ $ \(C.CPlayer, posP, fp, picBundle) ->
-    AS.cmapIf 
-      (isPlayerClose posP) 
-      (\(C.CEnemy e, health) -> (Anim.initEnemyAttackAnim picBundle e, decreaseFoodPoints fp health))
+  A.cmapM_ $ \(C.CPlayer, posP, picBundle, etyP) -> 
+    A.cmapM_ $ \(C.CEnemy e, posE, health, etyE) ->
+      when (isPlayerClose posP posE) $ do 
+        A.set etyE (Anim.initEnemyAttackAnim picBundle e)
+        A.set etyP (Anim.initPlayerHurtAnim picBundle)
+        decreaseFoodPoints health
 
 
 isPlayerClose :: C.CPosition -> C.CPosition -> Bool 
@@ -26,9 +30,10 @@ isPlayerClose (C.CPosition (L.V2 xP yP)) (C.CPosition (L.V2 xE yE)) =
   || (yP == yE && abs(xP - xE) == 1)
 
 
-decreaseFoodPoints :: C.CFoodPoints -> C.CHealth -> C.CFoodPoints
-decreaseFoodPoints (C.CFoodPoints fp) (C.CHealth _ damInfl _) = 
-  C.CFoodPoints (fp - damInfl)
+decreaseFoodPoints :: C.CHealth -> C.System' ()
+decreaseFoodPoints (C.CHealth _ damInfl _) = do
+  A.modify A.global $ \(C.CFoodPoints fp) -> C.CFoodPoints (fp - damInfl)
+  A.set A.global $ C.CPointsChange (mconcat ["-", show damInfl, "  "])
 
 
 playerAttack :: C.System' ()

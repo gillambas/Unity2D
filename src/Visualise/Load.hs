@@ -2,19 +2,16 @@
 -- N.B.: The top left sprite in the sheet has coordinate (0,0).
 
 module Visualise.Load (
-  createPictureBundle,
-  -- TODO: Remove after testing.
-  loadPlayerHurt,
+  createPictureBundle
 )
 where
 
-import Visualise.Tools (cropDynamicImage, fromDynamicImage', readImage')
+import qualified Apecs.Gloss     as AG
+import qualified Codec.Picture   as CP
+import qualified Data.Map        as Map 
 
-import qualified Apecs.Gloss   as AG
-import qualified Codec.Picture as CP
-import qualified Data.Map      as Map 
-
-import qualified Components    as C
+import qualified Components      as C
+import qualified Visualise.Tools as VTools
 
 
 ----------------------------------------------------------------------------------------------
@@ -40,6 +37,7 @@ createPictureBundle = do
       outerWalls    = loadOuterWallTiles spriteSheet
       soda          = loadSoda spriteSheet
       playerAttack  = loadPlayerAttack spriteSheet
+      playerHurt    = loadPlayerHurt spriteSheet
       playerIdle    = loadPlayerIdle spriteSheet
       vampireAttack = loadVampireAttack spriteSheet
       vampireIdle   = loadVampireIdle spriteSheet
@@ -59,6 +57,7 @@ createPictureBundle = do
         , C.intactInnerWallPics  = intactWalls'
         , C.outerWallPics        = outerWalls'
         , C.playerAttackPics     = playerAttack
+        , C.playerHurtPics       = playerHurt  
         , C.playerIdlePics       = playerIdle
         , C.sodaPic              = soda
         , C.vampireAttackPics    = vampireAttack
@@ -71,7 +70,7 @@ createPictureBundle = do
 
 
 loadSpriteSheet :: IO CP.DynamicImage
-loadSpriteSheet = readImage' spriteSheetPath
+loadSpriteSheet = VTools.readImage' spriteSheetPath
 
 
 loadExit  = loadPic' (4,2)
@@ -175,8 +174,8 @@ loadPic cellWidth cellHeight (row, col) img = croppedPic
   where
     x = row * cellWidth
     y = col * cellHeight
-    croppedImg = cropDynamicImage x y cellWidth cellHeight img
-    croppedPic = fromDynamicImage' croppedImg
+    croppedImg = VTools.cropDynamicImage x y cellWidth cellHeight img
+    croppedPic = VTools.fromDynamicImage' croppedImg
 
 
 loadPics' :: [(Int, Int)] -> CP.DynamicImage -> [AG.Picture]

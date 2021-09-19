@@ -2,6 +2,7 @@ module Visualise.Animations (
   initEnemyAttackAnim,
   initEnemyIdleAnim,
   initPlayerAttackAnim,
+  initPlayerHurtAnim,
   initPlayerIdleAnim,
   overrideFiniteAnimations,
   stepAnimation
@@ -26,6 +27,10 @@ initEnemyIdleAnim picBundle C.Zombie  = C.CAnimation 0.25 (C.zombieIdlePics picB
 
 initPlayerAttackAnim :: C.CPictureBundle -> C.CAnimation
 initPlayerAttackAnim picBundle = C.CAnimation 0.5 (C.playerAttackPics picBundle) 0 True
+
+
+initPlayerHurtAnim :: C.CPictureBundle -> C.CAnimation
+initPlayerHurtAnim picBundle = C.CAnimation 0.5 (C.playerHurtPics picBundle) 0 True
 
 
 initPlayerIdleAnim :: C.CPictureBundle -> C.CAnimation

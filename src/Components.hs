@@ -220,6 +220,7 @@ data CPictureBundle = CPictureBundle
   , intactInnerWallPics   :: Map.Map InnerWall AG.Picture 
   , outerWallPics         :: Map.Map OuterWall AG.Picture
   , playerAttackPics      :: [AG.Picture]
+  , playerHurtPics        :: [AG.Picture]
   , playerIdlePics        :: [AG.Picture]
   , sodaPic               :: AG.Picture
   , vampireAttackPics     :: [AG.Picture]
@@ -239,6 +240,7 @@ instance Monoid CPictureBundle where
     , intactInnerWallPics  = mempty 
     , outerWallPics        = mempty
     , playerAttackPics     = mempty
+    , playerHurtPics       = mempty
     , playerIdlePics       = mempty
     , sodaPic              = mempty
     , vampireAttackPics    = mempty
