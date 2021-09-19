@@ -125,6 +125,8 @@ data CConfig = CConfig
   , innerWallsRange    :: (Int, Int)
   , foodPoints         :: Int
   , innerWallHealth    :: CHealth
+  , vampireHealth      :: CHealth
+  , zombieHealth       :: CHealth 
   , nutrition          :: Nutrition
   }
 
@@ -142,7 +144,9 @@ instance Monoid CConfig where
     , foodRange          = (1, 5)
     , innerWallsRange    = (5, 9)
     , foodPoints         = 100
-    , innerWallHealth    = CHealth 4 1
+    , innerWallHealth    = CHealth 4 0 1
+    , vampireHealth      = CHealth 4 10 1
+    , zombieHealth       = CHealth 4 20 1
     , nutrition          = Nutrition {soda = 20, fruit = 10}
     }
 
@@ -172,8 +176,9 @@ instance Component CFoodPoints where type Storage CFoodPoints = Global CFoodPoin
 
 -- CHealth
 data CHealth = CHealth 
-  { hp     :: Int -- ^ Hit points.
-  , damage :: Int -- ^ Damage inflicted to the object when hit by the player.
+  { hp            :: Int -- ^ Hit points.
+  , damageInflict :: Int -- ^ Damage inflicted to the player when hit by the object.
+  , damageReceive :: Int -- ^ Damage inflicted to the object when hit by the player.
   }
   deriving (Show)
 

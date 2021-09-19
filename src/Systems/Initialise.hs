@@ -104,7 +104,8 @@ setupScene = do
 
 setupScene' :: C.CConfig -> C.CPictureBundle -> Int -> IO ([C.InnerWallComponents], [C.FoodComponents], [C.EnemyComponents])
 setupScene' 
-  C.CConfig{C.bottomLeft, C.topRight, C.innerWallsRange, C.foodRange, C.innerWallHealth, C.nutrition} 
+  C.CConfig{ C.bottomLeft, C.topRight, C.innerWallsRange, C.foodRange, C.innerWallHealth, C.nutrition
+           , C.vampireHealth, C.zombieHealth } 
   picBundle@C.CPictureBundle{C.intactInnerWallPics, C.damagedInnerWallPics} 
   level = do
 
@@ -141,7 +142,7 @@ setupScene'
   let enemyPositions' = map C.CPosition enemyPositions
       enemyTypes'     = map C.CEnemy enemyTypes
       animations      = map (Anim.initEnemyIdleAnim picBundle) enemyTypes 
-      enemyLives      = replicate nEnemies (C.CHealth 4 2) -- TODO: Read from config
+      enemyLives      = map (\e -> if e==C.Vampire then vampireHealth else zombieHealth) enemyTypes
       enemies         = zip4 enemyPositions' enemyTypes' animations enemyLives
 
   return (innerWalls, foods, enemies)

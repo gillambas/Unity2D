@@ -30,10 +30,11 @@ library
       Components
       EventHandling
       Step
-      Systems.Getters
+      Systems.Attack
+      Systems.Get
       Systems.Initialise
-      Systems.Movers
-      Systems.Removers
+      Systems.Move
+      Systems.Remove
       Visualise.Animations
       Visualise.Draw
       Visualise.Load

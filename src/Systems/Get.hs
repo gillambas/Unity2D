@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE Rank2Types       #-}
 
-module Systems.Getters (
+module Systems.Get (
   getAll,
   getEnemyPositions,
   getInnerWallPositions,

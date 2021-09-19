@@ -1,4 +1,4 @@
-module Systems.Movers (
+module Systems.Move (
   moveEnemy,
   movePlayer
 )
@@ -6,13 +6,13 @@ where
 
 import Control.Monad (unless, when)
 
-import qualified Apecs           as A
-import qualified Apecs.Gloss     as AG
-import qualified Apecs.System    as AS
-import qualified Linear          as L
+import qualified Apecs        as A
+import qualified Apecs.Gloss  as AG
+import qualified Apecs.System as AS
+import qualified Linear       as L
 
-import qualified Components      as C
-import qualified Systems.Getters as SGet
+import qualified Components   as C
+import qualified Systems.Get  as SGet
 
 
 moveEnemy :: C.System' ()

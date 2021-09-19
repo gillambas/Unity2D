@@ -1,4 +1,4 @@
-module Systems.Removers (
+module Systems.Remove (
   removeEnemies,
   removeFood,
   removeInnerWalls
@@ -16,13 +16,13 @@ import qualified Components   as C
 -- | Remove enemies with low hp. 
 removeEnemies :: C.System' ()
 removeEnemies =
-  AS.cmapIf (\(C.CHealth hp _) -> hp <= 0) (\(C.CEnemy _) -> A.Not @C.EnemyComponents)
+  AS.cmapIf (\(C.CHealth hp _ _) -> hp <= 0) (\(C.CEnemy _) -> A.Not @C.EnemyComponents)
 
 
 -- | Remove inner walls with low hp.
 removeInnerWalls :: C.System' ()
 removeInnerWalls =
-  AS.cmapIf (\(C.CHealth hp _) -> hp <= 0) (\(C.CInnerWall _) -> A.Not @C.InnerWallComponents)
+  AS.cmapIf (\(C.CHealth hp _ _) -> hp <= 0) (\(C.CInnerWall _) -> A.Not @C.InnerWallComponents)
 
 
 -- | Remove food when the player consumes it.

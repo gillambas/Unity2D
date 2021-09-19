@@ -31,7 +31,7 @@ draw boardPic = do
 
 
 innerWallPic :: C.CInnerWallPic -> C.CHealth -> AG.Picture
-innerWallPic (C.CInnerWallPic intact damaged) (C.CHealth hp _) =
+innerWallPic (C.CInnerWallPic intact damaged) (C.CHealth hp _ _) =
   if   hp <= 2 
   then damaged
   else intact

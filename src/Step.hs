@@ -8,7 +8,7 @@ import Control.Monad (void, when)
 import qualified Apecs                as A
 
 import qualified Components           as C
-import qualified Systems.Removers     as SRem
+import qualified Systems.Remove       as SRem
 import qualified Visualise.Animations as Anim
 
 
