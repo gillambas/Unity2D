@@ -17,7 +17,17 @@ import qualified Visualise.Animations as Anim
 
 
 eventHandler :: AG.Event -> C.System' ()
-eventHandler event =
+eventHandler event = do
+  C.CScreen screen <- A.get A.global
+
+  case screen of 
+    C.Game       -> handleGame event
+    C.LevelIntro -> handleLevelIntro event
+    C.GameOver   -> return ()
+
+
+handleGame :: AG.Event -> C.System' ()
+handleGame event = 
   case event of 
     -- Move player
     (AG.EventKey key@(AG.SpecialKey AG.KeyLeft ) AG.Down _ _) -> SMove.movePlayer key
@@ -33,3 +43,9 @@ eventHandler event =
 
     -- Unsupported key
     _ -> return ()
+
+
+handleLevelIntro :: AG.Event -> C.System' ()
+handleLevelIntro (AG.EventKey key@(AG.SpecialKey AG.KeyEnter) AG.Down _ _) = A.set A.global (C.CScreen C.Game)
+handleLevelIntro _ = return () 
+  

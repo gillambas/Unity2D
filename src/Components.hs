@@ -31,6 +31,7 @@ module Components (
   CPlayer(..),
   CPointsChange(..),
   CPosition(..),
+  CScreen(..),
   CSkipMove(..),
   CTime(..),
   -- * Other Data Types
@@ -40,6 +41,7 @@ module Components (
   InnerWall(..),
   Nutrition(..),
   OuterWall(..),
+  Screen(..),
   -- * Type Synonyms
   EnemyComponents,
   FoodComponents,
@@ -95,6 +97,8 @@ data InnerWall = IW1 | IW2 | IW3 | IW4 | IW5 | IW6 | IW7 deriving (Bounded, Enum
 data OuterWall = OW1 | OW2 | OW3 deriving (Bounded, Enum, Eq, Ord, Show) 
 
 data Nutrition = Nutrition {soda :: Int, fruit :: Int} deriving (Show)
+
+data Screen = LevelIntro | Game | GameOver deriving (Eq, Show)
 ----------------------------------------------------------------------------------------------
 
 
@@ -268,6 +272,12 @@ newtype CPosition = CPosition Position
 
 instance Component CPosition where type Storage CPosition = Map CPosition
 
+-- CScreen 
+newtype CScreen = CScreen Screen deriving (Show)
+instance Semigroup CScreen where (<>) _ s = s
+instance Monoid CScreen where mempty = CScreen LevelIntro 
+instance Component CScreen where type Storage CScreen = Global CScreen
+
 -- CSkipMove
 newtype CSkipMove = CSkipMove Bool deriving (Show)
 instance Semigroup CSkipMove where (<>) (CSkipMove s1) (CSkipMove s2) = CSkipMove (s1 && s2)
@@ -303,6 +313,7 @@ makeWorld "World"
   , ''CPlayer
   , ''CPointsChange
   , ''CPosition
+  , ''CScreen
   , ''CSkipMove
   , ''CTime
   , ''AG.Camera ]

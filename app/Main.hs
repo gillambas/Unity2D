@@ -23,7 +23,7 @@ main = do
     boardPic <- Draw.createBoardPicture
     AG.play 
       AG.FullScreen
-      AG.white
+      AG.black
       60
       (Draw.draw boardPic)
       EH.eventHandler

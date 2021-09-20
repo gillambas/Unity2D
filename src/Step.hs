@@ -18,21 +18,11 @@ import qualified Visualise.Animations as Anim
 -- To be used with Apecs.Gloss.play.
 stepper :: Float -> C.System' ()
 stepper dT = do
-  incrTime dT
+  C.CScreen screen <- A.get A.global
 
-  Anim.overrideFiniteAnimations
-
-  A.cmapM_ $ \anim -> 
-    triggerEvery dT (C.period anim) 0.0 (A.cmap $ \anim -> Anim.stepAnimation anim)
-
-  triggerEvery dT 3.0 0.0 SRem.removePointsChange
-
-  triggerEvery dT 2.0 0.0 SMove.moveEnemy
-  triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
-
-  SRem.removeFood
-  SRem.removeInnerWalls
-  SRem.removeEnemies
+  case screen of 
+    C.Game -> stepGame dT
+    _      -> stepTitleCard dT
 
 
 -- | Run a system periodically.
@@ -49,3 +39,26 @@ triggerEvery dT period phase sys = do
 -- Copied from https://github.com/jonascarpay/apecs/blob/master/examples/Shmup.md.
 incrTime :: Float -> C.System' ()
 incrTime dT = A.modify A.global $ \(C.CTime t) -> C.CTime (t+dT)
+
+
+stepTitleCard :: Float -> C.System' ()
+stepTitleCard _ = return ()
+
+
+stepGame :: Float -> C.System' ()
+stepGame dT = do
+  incrTime dT
+
+  Anim.overrideFiniteAnimations
+
+  A.cmapM_ $ \anim -> 
+    triggerEvery dT (C.period anim) 0.0 (A.cmap $ \anim -> Anim.stepAnimation anim)
+
+  triggerEvery dT 3.0 0.0 SRem.removePointsChange
+
+  triggerEvery dT 2.0 0.0 SMove.moveEnemy
+  triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
+
+  SRem.removeFood
+  SRem.removeInnerWalls
+  SRem.removeEnemies
