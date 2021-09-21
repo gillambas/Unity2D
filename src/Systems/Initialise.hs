@@ -29,7 +29,7 @@ initialise = do
   picBundle <- A.get A.global 
 
   A.set A.global (C.CFoodPoints (C.foodPoints config))
-  A.set A.global (C.CLevel 10) -- TODO: Start from level 0
+  A.set A.global (C.CLevel 10) -- TODO: Start from level 1
 
   A.newEntity_ (C.startPosition config, C.CPlayer, Anim.initPlayerIdleAnim picBundle)
   A.newEntity_ (C.exitPosition config, C.CExit) 

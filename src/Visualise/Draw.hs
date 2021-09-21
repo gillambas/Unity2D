@@ -11,9 +11,26 @@ import qualified Data.Map        as Map
 import qualified Components      as C
 import qualified Visualise.Tools as VTools
 
- 
+
 draw :: AG.Picture -> C.System' AG.Picture
-draw boardPic = do
+draw boardPic = do 
+  C.CScreen screen <- A.get A.global 
+
+  case screen of 
+    C.LevelIntro -> drawLevelIntro
+    C.Game       -> drawGame boardPic
+    C.GameOver   -> drawGame boardPic
+
+
+drawLevelIntro :: C.System' AG.Picture
+drawLevelIntro = do 
+  level :: C.CLevel <- A.get A.global 
+
+  return (AG.color AG.white . AG.scale 0.3 0.3 . AG.text . show $ level)
+
+
+drawGame :: AG.Picture -> C.System' AG.Picture
+drawGame boardPic = do
   config    <- A.get A.global
   picBundle <- A.get A.global
 

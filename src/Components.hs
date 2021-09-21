@@ -202,9 +202,10 @@ data CInnerWallPic = CInnerWallPic
 instance Component CInnerWallPic where type Storage CInnerWallPic = Map CInnerWallPic
 
 -- CLevel
-newtype CLevel = CLevel Int deriving (Show, Num)
+newtype CLevel = CLevel Int deriving (Num)
+instance Show CLevel where show (CLevel l) = "Day " <> show l
 instance Semigroup CLevel where (<>) = (+)
-instance Monoid CLevel where mempty = 0
+instance Monoid CLevel where mempty = 1
 instance Component CLevel where type Storage CLevel = Global CLevel 
 
 -- CNutrition

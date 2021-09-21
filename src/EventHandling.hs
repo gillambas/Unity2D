@@ -46,6 +46,9 @@ handleGame event =
 
 
 handleLevelIntro :: AG.Event -> C.System' ()
-handleLevelIntro (AG.EventKey key@(AG.SpecialKey AG.KeyEnter) AG.Down _ _) = A.set A.global (C.CScreen C.Game)
-handleLevelIntro _ = return () 
+handleLevelIntro event = 
+  case event of 
+    (AG.EventKey (AG.SpecialKey AG.KeyEnter) AG.Down _ _) -> A.set A.global (C.CScreen C.Game)
+    (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _)   -> A.liftIO exitSuccess
+    _                                                     -> return () 
   
