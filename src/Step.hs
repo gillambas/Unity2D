@@ -60,9 +60,9 @@ stepGame dT = do
   triggerEvery dT 2.0 0.0 SMove.moveEnemy
   triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
 
-  SRem.removeEatenFood
-  SRem.removeDeadInnerWalls
   SRem.removeDeadEnemies
+  SRem.removeDeadInnerWalls
+  SRem.removeEatenFood
   
   SCheck.checkExit
   SCheck.checkGameOver
