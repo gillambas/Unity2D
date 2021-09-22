@@ -52,7 +52,7 @@ boardSetup = do
   mapM_ A.newEntity innerArea
 
 
-createOuterBoarder :: C.System' [(C.CPosition, C.COuterWall)]
+createOuterBoarder :: C.System' [C.OuterWallComponents]
 createOuterBoarder = do 
   config <- A.get A.global 
 
@@ -69,7 +69,7 @@ createOuterBoarder = do
   return $ zip outerBoarder' tiles'
 
 
-fillInnerArea :: C.System' [(C.CPosition, C.CFloor)]
+fillInnerArea :: C.System' [C.FloorComponents]
 fillInnerArea = do 
   config <- A.get A.global 
 

@@ -9,6 +9,7 @@ import qualified Apecs                as A
 
 import qualified Components           as C
 import qualified Systems.Attack       as SAttack
+import qualified Systems.Check        as SCheck
 import qualified Systems.Move         as SMove
 import qualified Systems.Remove       as SRem
 import qualified Visualise.Animations as Anim
@@ -59,6 +60,9 @@ stepGame dT = do
   triggerEvery dT 2.0 0.0 SMove.moveEnemy
   triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
 
-  SRem.removeFood
-  SRem.removeInnerWalls
-  SRem.removeEnemies
+  SRem.removeEatenFood
+  SRem.removeDeadInnerWalls
+  SRem.removeDeadEnemies
+  
+  SCheck.checkExit
+  SCheck.checkGameOver

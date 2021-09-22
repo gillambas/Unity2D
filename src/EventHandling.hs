@@ -23,32 +23,35 @@ eventHandler event = do
   case screen of 
     C.Game       -> handleGame event
     C.LevelIntro -> handleLevelIntro event
-    C.GameOver   -> return ()
+    C.GameOver   -> handleGameOver event
 
 
 handleGame :: AG.Event -> C.System' ()
-handleGame event = 
-  case event of 
-    -- Move player
-    (AG.EventKey key@(AG.SpecialKey AG.KeyLeft ) AG.Down _ _) -> SMove.movePlayer key
-    (AG.EventKey key@(AG.SpecialKey AG.KeyRight) AG.Down _ _) -> SMove.movePlayer key
-    (AG.EventKey key@(AG.SpecialKey AG.KeyUp   ) AG.Down _ _) -> SMove.movePlayer key
-    (AG.EventKey key@(AG.SpecialKey AG.KeyDown ) AG.Down _ _) -> SMove.movePlayer key
+handleGame = \case
+  -- Move player
+  (AG.EventKey key@(AG.SpecialKey AG.KeyLeft ) AG.Down _ _) -> SMove.movePlayer key
+  (AG.EventKey key@(AG.SpecialKey AG.KeyRight) AG.Down _ _) -> SMove.movePlayer key
+  (AG.EventKey key@(AG.SpecialKey AG.KeyUp   ) AG.Down _ _) -> SMove.movePlayer key
+  (AG.EventKey key@(AG.SpecialKey AG.KeyDown ) AG.Down _ _) -> SMove.movePlayer key
 
-    -- Player attacks
-    (AG.EventKey key@(AG.SpecialKey AG.KeySpace) AG.Down _ _) -> SAttack.playerAttack
+  -- Player attacks
+  (AG.EventKey key@(AG.SpecialKey AG.KeySpace) AG.Down _ _) -> SAttack.playerAttack
 
-    -- Terminate game
-    (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _) -> A.liftIO exitSuccess
+  -- Terminate game
+  (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _) -> A.liftIO exitSuccess
 
-    -- Unsupported key
-    _ -> return ()
+  -- Unsupported key
+  _ -> return ()
 
 
 handleLevelIntro :: AG.Event -> C.System' ()
-handleLevelIntro event = 
-  case event of 
-    (AG.EventKey (AG.SpecialKey AG.KeyEnter) AG.Down _ _) -> A.set A.global (C.CScreen C.Game)
-    (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _)   -> A.liftIO exitSuccess
-    _                                                     -> return () 
+handleLevelIntro = \case
+  (AG.EventKey (AG.SpecialKey AG.KeyEnter) AG.Down _ _) -> A.set A.global (C.CScreen C.Game)
+  (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _)   -> A.liftIO exitSuccess
+  _                                                     -> return () 
   
+
+handleGameOver :: AG.Event -> C.System' ()
+handleGameOver = \case 
+  (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _) -> A.liftIO exitSuccess
+  _                                                   -> return () 

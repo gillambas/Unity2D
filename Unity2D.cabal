@@ -45,6 +45,7 @@ library
   hs-source-dirs:
       src
   default-extensions:
+      LambdaCase
       NamedFieldPuns
       ScopedTypeVariables
       TypeApplications
@@ -68,6 +69,7 @@ executable Unity2D-exe
   hs-source-dirs:
       app
   default-extensions:
+      LambdaCase
       NamedFieldPuns
       ScopedTypeVariables
       TypeApplications
@@ -94,6 +96,7 @@ test-suite Unity2D-test
   hs-source-dirs:
       test
   default-extensions:
+      LambdaCase
       NamedFieldPuns
       ScopedTypeVariables
       TypeApplications

@@ -19,14 +19,20 @@ draw boardPic = do
   case screen of 
     C.LevelIntro -> drawLevelIntro
     C.Game       -> drawGame boardPic
-    C.GameOver   -> drawGame boardPic
+    C.GameOver   -> drawGameOver
 
 
 drawLevelIntro :: C.System' AG.Picture
 drawLevelIntro = do 
   level :: C.CLevel <- A.get A.global 
-
   return (AG.color AG.white . AG.scale 0.3 0.3 . AG.text . show $ level)
+
+
+drawGameOver :: C.System' AG.Picture
+drawGameOver = do 
+  C.CLevel l <- A.get A.global
+  let message = AG.color AG.white . AG.scale 0.3 0.3 . AG.text $ mconcat ["After ", show l, " days, you starved."]
+  return message
 
 
 drawGame :: AG.Picture -> C.System' AG.Picture
