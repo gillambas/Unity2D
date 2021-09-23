@@ -66,7 +66,7 @@ createOuterBoarder = do
   tiles <- A.liftIO $ replicateM (length outerBoarder) R.randomIO
   let tiles' = map C.COuterWall tiles
 
-  return $ zip outerBoarder' tiles'
+  return $ zip tiles' outerBoarder' 
 
 
 fillInnerArea :: C.System' [C.FloorComponents]
@@ -81,7 +81,7 @@ fillInnerArea = do
   tiles <- A.liftIO $ replicateM (length inner) R.randomIO
   let tiles' = map C.CFloor tiles
 
-  return $ zip inner' tiles'
+  return $ zip tiles' inner'
 ----------------------------------------------------------------------------------------------
 
 
@@ -123,7 +123,7 @@ setupScene'
       innerWallTypes'     = map C.CInnerWall innerWallTypes
       innerWallPics       = map (uncurry C.CInnerWallPic . ((Map.!) intactInnerWallPics &&& (Map.!) damagedInnerWallPics)) innerWallTypes
       innerWallLives      = replicate nInnerWalls innerWallHealth
-      innerWalls          = zip4 innerWallPositions' innerWallTypes' innerWallPics innerWallLives
+      innerWalls          = zip4 innerWallTypes' innerWallPositions' innerWallPics innerWallLives
 
   -- Place food.
   nFood <- R.randomRIO foodRange
@@ -133,7 +133,7 @@ setupScene'
       foodTypes'     = map C.CFood foodTypes
       nutritions     = map (\f -> if f==C.Soda then C.soda nutrition else C.fruit nutrition) foodTypes
       nutritions'    = map C.CNutrition nutritions
-      foods          = zip3 foodPositions' foodTypes' nutritions'
+      foods          = zip3 foodTypes' foodPositions' nutritions'
 
   -- Place enemies.
   let nEnemies = ceiling $ logBase 2.0 (fromIntegral level)
@@ -143,7 +143,7 @@ setupScene'
       enemyTypes'     = map C.CEnemy enemyTypes
       animations      = map (Anim.initEnemyIdleAnim picBundle) enemyTypes 
       enemyLives      = map (\e -> if e==C.Vampire then vampireHealth else zombieHealth) enemyTypes
-      enemies         = zip4 enemyPositions' enemyTypes' animations enemyLives
+      enemies         = zip4 enemyTypes' enemyPositions' animations enemyLives
 
   return (innerWalls, foods, enemies)
 ----------------------------------------------------------------------------------------------

@@ -80,11 +80,11 @@ spriteHeight = 32
 ----------------------------------------------------------------------------------------------
 type Position = L.V2 Int
 
-type EnemyComponents     = (CPosition, CEnemy, CAnimation, CHealth)
-type FloorComponents     = (CPosition, CFloor)
-type FoodComponents      = (CPosition, CFood, CNutrition)
-type InnerWallComponents = (CPosition, CInnerWall, CInnerWallPic, CHealth)
-type OuterWallComponents = (CPosition, COuterWall)
+type EnemyComponents     = (CEnemy, CPosition, CAnimation, CHealth)
+type FloorComponents     = (CFloor, CPosition)
+type FoodComponents      = (CFood, CPosition, CNutrition)
+type InnerWallComponents = (CInnerWall, CPosition, CInnerWallPic, CHealth)
+type OuterWallComponents = (COuterWall, CPosition)
 ----------------------------------------------------------------------------------------------
 
 
@@ -214,7 +214,7 @@ instance Component CInnerWallPic where type Storage CInnerWallPic = Map CInnerWa
 newtype CLevel = CLevel Int deriving (Enum, Num)
 instance Show CLevel where show (CLevel l) = "Day " <> show l
 instance Semigroup CLevel where (<>) = (+)
-instance Monoid CLevel where mempty = 1
+instance Monoid CLevel where mempty = 1 -- WARNING: Convenient but doesn't satisfy Monoid laws! 
 instance Component CLevel where type Storage CLevel = Global CLevel 
 
 -- CNutrition
