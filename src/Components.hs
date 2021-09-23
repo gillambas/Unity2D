@@ -45,10 +45,12 @@ module Components (
   Screen(..),
   -- * Type Synonyms
   EnemyComponents,
+  ExitComponents,
   FloorComponents,
   FoodComponents,
   InnerWallComponents,
   OuterWallComponents,
+  PlayerComponents,
   Position,
   System',
   -- * Sprite dimensions
@@ -81,10 +83,12 @@ spriteHeight = 32
 type Position = L.V2 Int
 
 type EnemyComponents     = (CEnemy, CPosition, CAnimation, CHealth)
+type ExitComponents      = (CExit, CPosition)
 type FloorComponents     = (CFloor, CPosition)
 type FoodComponents      = (CFood, CPosition, CNutrition)
 type InnerWallComponents = (CInnerWall, CPosition, CInnerWallPic, CHealth)
 type OuterWallComponents = (COuterWall, CPosition)
+type PlayerComponents    = (CPlayer, CPosition, CAnimation)
 ----------------------------------------------------------------------------------------------
 
 
@@ -214,7 +218,7 @@ instance Component CInnerWallPic where type Storage CInnerWallPic = Map CInnerWa
 newtype CLevel = CLevel Int deriving (Enum, Num)
 instance Show CLevel where show (CLevel l) = "Day " <> show l
 instance Semigroup CLevel where (<>) = (+)
-instance Monoid CLevel where mempty = 1 -- WARNING: Convenient but doesn't satisfy Monoid laws! 
+instance Monoid CLevel where mempty = 0
 instance Component CLevel where type Storage CLevel = Global CLevel 
 
 -- CNutrition

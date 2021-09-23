@@ -19,10 +19,12 @@ removeAll :: C.System' ()
 removeAll = do 
   removeBoardPicture
   removeEnemies
+  removeExit
   removeFloor
   removeFood
   removeInnerWalls
   removeOuterWalls
+  removePlayer
   removePointsChange
 
 
@@ -32,6 +34,10 @@ removeBoardPicture = A.set A.global (mempty :: C.CBoardPicture)
 
 removeEnemies :: C.System' ()
 removeEnemies = A.cmap  $ \(C.CEnemy _) -> A.Not @C.EnemyComponents
+
+
+removeExit :: C.System' ()
+removeExit = A.cmap  $ \C.CExit -> A.Not @C.ExitComponents
 
 
 removeFloor :: C.System' ()
@@ -48,6 +54,10 @@ removeInnerWalls = A.cmap  $ \(C.CInnerWall _) -> A.Not @C.InnerWallComponents
 
 removeOuterWalls :: C.System' ()
 removeOuterWalls = A.cmap  $ \(C.COuterWall _ ) -> A.Not @C.OuterWallComponents
+
+
+removePlayer :: C.System' ()
+removePlayer = A.cmap  $ \C.CPlayer -> A.Not @C.PlayerComponents
 
 
 -- | Remove enemies with low hp. 

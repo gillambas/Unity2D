@@ -8,12 +8,11 @@ import System.Exit (exitSuccess)
 import qualified Apecs                as A
 import qualified Apecs.Gloss          as AG
 import qualified Apecs.System         as AS
-import qualified Linear               as L
 
 import qualified Components           as C
 import qualified Systems.Attack       as SAttack
+import qualified Systems.Initialise   as SInit
 import qualified Systems.Move         as SMove
-import qualified Visualise.Animations as Anim
 
 
 eventHandler :: AG.Event -> C.System' ()
@@ -38,10 +37,10 @@ handleGame = \case
   (AG.EventKey key@(AG.SpecialKey AG.KeySpace) AG.Down _ _) -> SAttack.playerAttack
 
   -- Terminate game
-  (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _) -> A.liftIO exitSuccess
+  (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _)       -> A.liftIO exitSuccess
 
   -- Unsupported key
-  _ -> return ()
+  _                                                         -> return ()
 
 
 handleLevelIntro :: AG.Event -> C.System' ()
@@ -52,6 +51,7 @@ handleLevelIntro = \case
   
 
 handleGameOver :: AG.Event -> C.System' ()
-handleGameOver = \case 
-  (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _) -> A.liftIO exitSuccess
-  _                                                   -> return () 
+handleGameOver = \case
+  (AG.EventKey (AG.SpecialKey AG.KeyEnter) AG.Down _ _) -> SInit.startNewGame
+  (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _)   -> A.liftIO exitSuccess
+  _                                                     -> return ()

@@ -19,8 +19,8 @@ main = do
   
   A.runWith w $ do
     A.set A.global picBundle
-    SInit.initialise
-    Draw.createBoardPicture
+    SInit.startNewGame
+
     AG.play 
       AG.FullScreen
       AG.black

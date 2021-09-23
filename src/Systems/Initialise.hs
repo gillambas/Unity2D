@@ -1,7 +1,8 @@
 module Systems.Initialise (
-  initialise,
   boardSetup,
-  setupScene
+  setupScene,
+  startNewGame,
+  startNewLevel
 )
 where
 
@@ -15,27 +16,51 @@ import qualified Linear               as L
 import qualified System.Random        as R
 
 import qualified Components           as C
+import qualified Systems.Remove       as SRem
 import qualified Visualise.Animations as Anim
+import qualified Visualise.Draw       as Draw
 
 
 ----------------------------------------------------------------------------------------------
------------------------                   INITIALISE                   -----------------------
+-----------------------              INITIALISE GAME/LEVEL             -----------------------
 ----------------------------------------------------------------------------------------------
--- | Initialise: Place the player, exit, outer walls, floor tiles, inner walls, enemies and food.
--- To be run at the beginning of each level.
-initialise :: C.System' ()
-initialise = do 
+startNewGame :: C.System' ()
+startNewGame = do 
+  config <- A.get A.global 
+
+  A.set A.global (C.CFoodPoints (C.foodPoints config))
+  A.set A.global (C.CLevel 1)
+
+  startNewLevel
+
+
+-- | Start a new level: Clear board, create a new board, set player to its origin.
+startNewLevel :: C.System' ()
+startNewLevel = do 
+  A.set A.global (C.CScreen C.LevelIntro)
+  SRem.removeAll
+  createExit
+  boardSetup
+  setupScene
+  Draw.createBoardPicture
+  createPlayer
+
+
+-- | Place the exit at the position given in the config.
+createExit :: C.System' ()
+createExit = do 
+  config    <- A.get A.global 
+
+  A.newEntity_ (C.CExit, C.exitPosition config) 
+
+
+-- | Place the player at his original position and with idle animation.
+createPlayer :: C.System' ()
+createPlayer = do
   config    <- A.get A.global 
   picBundle <- A.get A.global 
 
-  A.set A.global (C.CFoodPoints (C.foodPoints config))
-  A.set A.global (C.CLevel 10) -- TODO: Start from level 1
-
-  A.newEntity_ (C.startPosition config, C.CPlayer, Anim.initPlayerIdleAnim picBundle)
-  A.newEntity_ (C.exitPosition config, C.CExit) 
-
-  boardSetup
-  setupScene
+  A.newEntity_ (C.CPlayer, C.startPosition config, Anim.initPlayerIdleAnim picBundle)
 ----------------------------------------------------------------------------------------------
 
 
