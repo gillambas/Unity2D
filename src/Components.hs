@@ -243,7 +243,23 @@ data CPictureBundle = CPictureBundle
   , zombieIdlePics        :: [AG.Picture]
   }
 
-instance Semigroup CPictureBundle where (<>) _ p = p
+instance Semigroup CPictureBundle where
+  pb1 <> pb2 = CPictureBundle
+    { damagedInnerWallPics = damagedInnerWallPics pb1 <> damagedInnerWallPics pb2
+    , exitPic              = exitPic              pb1 <> exitPic              pb2
+    , floorPics            = floorPics            pb1 <> floorPics            pb2
+    , fruitPic             = fruitPic             pb1 <> fruitPic             pb2
+    , intactInnerWallPics  = intactInnerWallPics  pb1 <> intactInnerWallPics  pb2
+    , outerWallPics        = outerWallPics        pb1 <> outerWallPics        pb2
+    , playerAttackPics     = playerAttackPics     pb1 <> playerAttackPics     pb2
+    , playerHurtPics       = playerHurtPics       pb1 <> playerHurtPics       pb2
+    , playerIdlePics       = playerIdlePics       pb1 <> playerIdlePics       pb2
+    , sodaPic              = sodaPic              pb1 <> sodaPic              pb2
+    , vampireAttackPics    = vampireAttackPics    pb1 <> vampireAttackPics    pb2
+    , vampireIdlePics      = vampireIdlePics      pb1 <> vampireIdlePics      pb2
+    , zombieAttackPics     = zombieAttackPics     pb1 <> zombieAttackPics     pb2
+    , zombieIdlePics       = zombieIdlePics       pb1 <> zombieIdlePics       pb2
+    }
 
 instance Monoid CPictureBundle where
   mempty = CPictureBundle
