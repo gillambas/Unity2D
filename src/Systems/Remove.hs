@@ -1,5 +1,5 @@
 module Systems.Remove (
-  removeBoard,
+  removeAll,
   removeDeadEnemies,
   removeEatenFood,
   removeDeadInnerWalls,
@@ -15,13 +15,19 @@ import qualified Apecs.System as AS
 import qualified Components   as C 
 
 
-removeBoard :: C.System' ()
-removeBoard = do 
+removeAll :: C.System' ()
+removeAll = do 
+  removeBoardPicture
   removeEnemies
   removeFloor
   removeFood
   removeInnerWalls
   removeOuterWalls
+  removePointsChange
+
+
+removeBoardPicture :: C.System' ()
+removeBoardPicture = A.set A.global (mempty :: C.CBoardPicture)
 
 
 removeEnemies :: C.System' ()

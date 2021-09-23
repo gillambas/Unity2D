@@ -12,13 +12,13 @@ import qualified Components      as C
 import qualified Visualise.Tools as VTools
 
 
-draw :: AG.Picture -> C.System' AG.Picture
-draw boardPic = do 
+draw :: C.System' AG.Picture
+draw = do 
   C.CScreen screen <- A.get A.global 
 
   case screen of 
     C.LevelIntro -> drawLevelIntro
-    C.Game       -> drawGame boardPic
+    C.Game       -> drawGame
     C.GameOver   -> drawGameOver
 
 
@@ -35,10 +35,11 @@ drawGameOver = do
   return message
 
 
-drawGame :: AG.Picture -> C.System' AG.Picture
-drawGame boardPic = do
-  config    <- A.get A.global
-  picBundle <- A.get A.global
+drawGame :: C.System' AG.Picture
+drawGame = do
+  config                    <- A.get A.global
+  picBundle                 <- A.get A.global
+  C.CBoardPicture boardPic  <- A.get A.global
 
   player     <- AG.foldDraw $ \(C.CPlayer, pos, C.CAnimation _ sprites index _) -> VTools.translate' (VTools.positionToCoords' pos) (sprites !! index)
   enemies    <- AG.foldDraw $ \(C.CEnemy _, pos, C.CAnimation _ sprites index _) -> VTools.translate' (VTools.positionToCoords' pos) (sprites !! index)
@@ -65,7 +66,7 @@ foodPic C.Fruit = C.fruitPic
 foodPic C.Soda  = C.sodaPic
 
 
-createBoardPicture :: C.System' AG.Picture
+createBoardPicture :: C.System' ()
 createBoardPicture = do
   picBundle <- A.get A.global
 
@@ -73,4 +74,6 @@ createBoardPicture = do
   inner <- AG.foldDraw $ \(C.CFloor f, pos) -> VTools.translate' (VTools.positionToCoords' pos) (C.floorPics picBundle Map.! f)
   exit  <- AG.foldDraw $ \(C.CExit, pos) -> VTools.translate' (VTools.positionToCoords' pos) (C.exitPic picBundle)
 
-  return $ mconcat [outer, inner, exit]
+  let boardPic = mconcat [outer, inner, exit]
+
+  A.set A.global (C.CBoardPicture boardPic)

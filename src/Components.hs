@@ -15,6 +15,7 @@ module Components (
   World(..),
   -- * Components
   CAnimation(..),
+  CBoardPicture(..),
   CConfig(..),
   CEnemy(..), 
   CExit(..), 
@@ -119,6 +120,10 @@ data CAnimation = CAnimation
   }
 
 instance Component CAnimation where type Storage CAnimation = Map CAnimation
+
+-- CBoardPicture 
+newtype CBoardPicture = CBoardPicture AG.Picture deriving (Monoid, Semigroup, Show)
+instance Component CBoardPicture where type Storage CBoardPicture = Global CBoardPicture
 
 -- CConfig
 data CConfig = CConfig 
@@ -265,15 +270,13 @@ data CPlayer = CPlayer deriving (Show)
 instance Component CPlayer where type Storage CPlayer = Unique CPlayer
 
 -- CPointsChange
-newtype CPointsChange = CPointsChange String deriving (Show)
-instance Semigroup CPointsChange where (<>) (CPointsChange s1) (CPointsChange s2) = CPointsChange (s1 <> s2)
-instance Monoid CPointsChange where mempty = CPointsChange ""
+newtype CPointsChange = CPointsChange String deriving (Monoid, Semigroup, Show)
 instance Component CPointsChange where type Storage CPointsChange = Global CPointsChange 
 
 -- CPosition
 newtype CPosition = CPosition Position 
   deriving (Eq, Show)
-  deriving Num via Position
+  deriving Num via Position -- WARNING: fromInteger CPosition doesn't work!
 
 instance Component CPosition where type Storage CPosition = Map CPosition
 
@@ -302,6 +305,7 @@ instance Component CTime where type Storage CTime = Global CTime
 ----------------------------------------------------------------------------------------------
 makeWorld "World"
   [ ''CAnimation
+  , ''CBoardPicture
   , ''CConfig
   , ''CFloor
   , ''CFood

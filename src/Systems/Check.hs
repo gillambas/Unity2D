@@ -12,6 +12,7 @@ import qualified Components           as C
 import qualified Systems.Initialise   as SInit
 import qualified Systems.Remove       as SRem
 import qualified Visualise.Animations as Anim
+import qualified Visualise.Draw       as Draw
 
 
 checkExit :: C.System' ()
@@ -22,9 +23,10 @@ checkExit =
         A.modify A.global (succ :: C.CLevel -> C.CLevel)
         A.set A.global (C.CScreen C.LevelIntro)
         A.cmap $ \(C.CPlayer, config, picBundle) -> (C.startPosition config, Anim.initPlayerIdleAnim picBundle)
-        SRem.removeBoard
+        SRem.removeAll
         SInit.boardSetup
         SInit.setupScene
+        Draw.createBoardPicture
 
 
 checkGameOver :: C.System' ()

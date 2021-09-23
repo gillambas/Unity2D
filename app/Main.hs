@@ -20,11 +20,11 @@ main = do
   A.runWith w $ do
     A.set A.global picBundle
     SInit.initialise
-    boardPic <- Draw.createBoardPicture
+    Draw.createBoardPicture
     AG.play 
       AG.FullScreen
       AG.black
       60
-      (Draw.draw boardPic)
+      Draw.draw
       EH.eventHandler
       Step.stepper
