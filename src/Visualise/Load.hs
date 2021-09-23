@@ -8,7 +8,7 @@ where
 
 import qualified Apecs.Gloss     as AG
 import qualified Codec.Picture   as CP
-import qualified Data.Map        as Map 
+import qualified Data.Map        as Map
 
 import qualified Components      as C
 import qualified Visualise.Tools as VTools

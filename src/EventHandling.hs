@@ -7,7 +7,6 @@ import System.Exit (exitSuccess)
 
 import qualified Apecs                as A
 import qualified Apecs.Gloss          as AG
-import qualified Apecs.System         as AS
 
 import qualified Components           as C
 import qualified Systems.Attack       as SAttack

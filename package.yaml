@@ -1,6 +1,6 @@
 name:                Unity2D
 version:             0.1.0.0
-github:              "githubuser/Unity2D"
+github:              "montetzouma/Unity2D"
 license:             BSD3
 author:              "George Illambas"
 maintainer:          "gillambas@gmail.com"
@@ -17,7 +17,7 @@ category: Game
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/githubuser/Unity2D#readme>
+description:         Please see the README on GitHub at <https://github.com/montetzouma/Unity2D#readme>
 
 default-extensions:
   - LambdaCase
