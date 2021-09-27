@@ -11,6 +11,28 @@ import qualified Data.Map        as Map
 import qualified Components      as C
 import qualified Visualise.Tools as VTools
 
+import qualified Graphics.Text.TrueType      as TT 
+import qualified Graphics.Rasterific         as Rast
+import qualified Graphics.Rasterific.Texture as RastT
+import qualified Graphics.Gloss.Juicy        as GJ
+import qualified Linear                      as L 
+import qualified Codec.Picture.Types         as PT
+
+test :: IO AG.Picture
+test = do 
+  fontErr <- TT.loadFontFile "assets/fonts/PressStart2P-Regular.ttf"
+
+  let text = case fontErr of
+        Left err   -> error err
+        Right font ->
+          Rast.renderDrawing 300 70 (PT.PixelRGBA8 255 255 255 255)
+            . Rast.withTexture (RastT.uniformTexture $ PT.PixelRGBA8 255 255 255 255) $
+              Rast.printTextAt font (Rast.PointSize 12) (Rast.V2 20 40) "A simple text test!"
+
+  let pic = GJ.fromImageRGBA8 text
+
+  return pic 
+
 
 draw :: C.System' AG.Picture
 draw = do 
@@ -23,10 +45,15 @@ draw = do
 
 
 drawLevelIntro :: C.System' AG.Picture
+drawLevelIntro = A.liftIO test 
+
+
+{-
+drawLevelIntro :: C.System' AG.Picture
 drawLevelIntro = do 
   level :: C.CLevel <- A.get A.global 
   return (AG.color AG.white . AG.scale 0.3 0.3 . AG.text . show $ level)
-
+-}
 
 drawGameOver :: C.System' AG.Picture
 drawGameOver = do 

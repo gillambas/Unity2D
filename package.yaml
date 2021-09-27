@@ -31,11 +31,13 @@ dependencies:
   - apecs-gloss
   - containers
   - extra
+  - FontyFruity
   - gloss-juicy
   - JuicyPixels
   - JuicyPixels-extra
   - linear
   - random
+  - Rasterific
 
 library:
   source-dirs: src
