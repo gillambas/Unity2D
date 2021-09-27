@@ -25,7 +25,7 @@ test = do
   let text = case fontErr of
         Left err   -> error err
         Right font ->
-          Rast.renderDrawing 300 70 (PT.PixelRGBA8 255 255 255 255)
+          Rast.renderDrawing 300 70 (PT.PixelRGBA8 0 0 0 255)
             . Rast.withTexture (RastT.uniformTexture $ PT.PixelRGBA8 255 255 255 255) $
               Rast.printTextAt font (Rast.PointSize 12) (Rast.V2 20 40) "A simple text test!"
 
