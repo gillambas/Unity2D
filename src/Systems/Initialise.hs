@@ -58,9 +58,9 @@ createExit = do
 createPlayer :: C.System' ()
 createPlayer = do
   config    <- A.get A.global 
-  picBundle <- A.get A.global 
+  graphics <- A.get A.global 
 
-  A.newEntity_ (C.CPlayer, C.startPosition config, Anim.initPlayerIdleAnim picBundle)
+  A.newEntity_ (C.CPlayer, C.startPosition config, Anim.initPlayerIdleAnim graphics)
 ----------------------------------------------------------------------------------------------
 
 
@@ -117,21 +117,21 @@ fillInnerArea = do
 setupScene :: C.System' ()
 setupScene = do 
   config     <- A.get A.global
-  picBundle  <- A.get A.global
+  graphics  <- A.get A.global
   C.CLevel l <- A.get A.global
 
-  (innerWalls, foods, enemies) <- A.liftIO $ setupScene' config picBundle l
+  (innerWalls, foods, enemies) <- A.liftIO $ setupScene' config graphics l
 
   mapM_ A.newEntity innerWalls
   mapM_ A.newEntity foods
   mapM_ A.newEntity enemies
 
 
-setupScene' :: C.CConfig -> C.CPictureBundle -> Int -> IO ([C.InnerWallComponents], [C.FoodComponents], [C.EnemyComponents])
+setupScene' :: C.CConfig -> C.CGraphics -> Int -> IO ([C.InnerWallComponents], [C.FoodComponents], [C.EnemyComponents])
 setupScene' 
   C.CConfig{ C.bottomLeft, C.topRight, C.innerWallsRange, C.foodRange, C.innerWallHealth, C.nutrition
            , C.vampireHealth, C.zombieHealth } 
-  picBundle@C.CPictureBundle{C.intactInnerWallPics, C.damagedInnerWallPics} 
+  graphics@C.CGraphics{C.intactInnerWallPics, C.damagedInnerWallPics} 
   level = do
 
   -- Leave an outer layer empty so that the maze is solvable.
@@ -166,7 +166,7 @@ setupScene'
   enemyTypes <- replicateM nEnemies R.randomIO
   let enemyPositions' = map C.CPosition enemyPositions
       enemyTypes'     = map C.CEnemy enemyTypes
-      animations      = map (Anim.initEnemyIdleAnim picBundle) enemyTypes 
+      animations      = map (Anim.initEnemyIdleAnim graphics) enemyTypes 
       enemyLives      = map (\e -> if e==C.Vampire then vampireHealth else zombieHealth) enemyTypes
       enemies         = zip4 enemyTypes' enemyPositions' animations enemyLives
 

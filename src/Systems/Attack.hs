@@ -16,11 +16,11 @@ import qualified Visualise.Animations as Anim
 
 enemiesAttack :: C.System' ()
 enemiesAttack =
-  A.cmapM_ $ \(C.CPlayer, posP, picBundle, etyP) -> 
+  A.cmapM_ $ \(C.CPlayer, posP, graphics, etyP) -> 
     A.cmapM_ $ \(C.CEnemy e, posE, health, etyE) ->
       when (isPlayerClose posP posE) $ do 
-        A.set etyE (Anim.initEnemyAttackAnim picBundle e)
-        A.set etyP (Anim.initPlayerHurtAnim picBundle)
+        A.set etyE (Anim.initEnemyAttackAnim graphics e)
+        A.set etyP (Anim.initPlayerHurtAnim graphics)
         decreaseFoodPoints health
 
 

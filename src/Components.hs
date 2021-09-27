@@ -28,7 +28,7 @@ module Components (
   CLevel(..),
   CNutrition(..),
   COuterWall(..),
-  CPictureBundle(..),
+  CGraphics(..),
   CPlayer(..),
   CPointsChange(..),
   CPosition(..),
@@ -61,10 +61,11 @@ where
 
 import Apecs
 
-import qualified Apecs.Gloss          as AG
-import qualified Data.Map             as Map
-import qualified Linear               as L
-import qualified System.Random        as R
+import qualified Apecs.Gloss            as AG
+import qualified Data.Map               as Map
+import qualified Graphics.Text.TrueType as TT
+import qualified Linear                 as L
+import qualified System.Random          as R
 
 
 ----------------------------------------------------------------------------------------------
@@ -229,11 +230,12 @@ instance Component CNutrition where type Storage CNutrition = Map CNutrition
 newtype COuterWall = COuterWall OuterWall deriving (Show) 
 instance Component COuterWall where type Storage COuterWall = Map COuterWall
 
--- CPictureBundle
-data CPictureBundle = CPictureBundle 
+-- CGraphics
+data CGraphics = CGraphics 
   { damagedInnerWallPics  :: Map.Map InnerWall AG.Picture 
-  , exitPic               :: AG.Picture
+  , exitPic               :: AG.Picture 
   , floorPics             :: Map.Map Floor AG.Picture
+  , font                  :: TT.Font
   , fruitPic              :: AG.Picture
   , intactInnerWallPics   :: Map.Map InnerWall AG.Picture 
   , outerWallPics         :: Map.Map OuterWall AG.Picture
@@ -247,11 +249,12 @@ data CPictureBundle = CPictureBundle
   , zombieIdlePics        :: [AG.Picture]
   }
 
-instance Semigroup CPictureBundle where
-  pb1 <> pb2 = CPictureBundle
+instance Semigroup CGraphics where
+  pb1 <> pb2 = CGraphics
     { damagedInnerWallPics = damagedInnerWallPics pb1 <> damagedInnerWallPics pb2
     , exitPic              = exitPic              pb1 <> exitPic              pb2
     , floorPics            = floorPics            pb1 <> floorPics            pb2
+    , font                 = font pb2 -- TODO: Think
     , fruitPic             = fruitPic             pb1 <> fruitPic             pb2
     , intactInnerWallPics  = intactInnerWallPics  pb1 <> intactInnerWallPics  pb2
     , outerWallPics        = outerWallPics        pb1 <> outerWallPics        pb2
@@ -265,11 +268,12 @@ instance Semigroup CPictureBundle where
     , zombieIdlePics       = zombieIdlePics       pb1 <> zombieIdlePics       pb2
     }
 
-instance Monoid CPictureBundle where
-  mempty = CPictureBundle
+instance Monoid CGraphics where
+  mempty = CGraphics
     { damagedInnerWallPics = mempty
     , exitPic              = mempty
     , floorPics            = mempty
+    , font                 = undefined  -- TODO: Think
     , fruitPic             = mempty
     , intactInnerWallPics  = mempty 
     , outerWallPics        = mempty
@@ -283,7 +287,7 @@ instance Monoid CPictureBundle where
     , zombieIdlePics       = mempty
     }
 
-instance Component CPictureBundle where type Storage CPictureBundle = Global CPictureBundle 
+instance Component CGraphics where type Storage CGraphics = Global CGraphics 
 
 -- CPlayer
 data CPlayer = CPlayer deriving (Show) 
@@ -338,7 +342,7 @@ makeWorld "World"
   , ''CLevel
   , ''CNutrition
   , ''COuterWall
-  , ''CPictureBundle
+  , ''CGraphics
   , ''CPlayer
   , ''CPointsChange
   , ''CPosition

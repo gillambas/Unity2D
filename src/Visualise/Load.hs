@@ -2,7 +2,7 @@
 -- N.B.: The top left sprite in the sheet has coordinate (0,0).
 
 module Visualise.Load (
-  createPictureBundle
+  loadGraphics
 )
 where
 
@@ -19,14 +19,18 @@ import qualified Visualise.Tools as VTools
 ----------------------------------------------------------------------------------------------
 spriteSheetPath :: FilePath
 spriteSheetPath = "assets/sprites/Scavengers_SpriteSheet.png"
+
+fontPath :: FilePath 
+fontPath = "assets/fonts/PressStart2P-Regular.ttf"
 ----------------------------------------------------------------------------------------------
 
 
 ----------------------------------------------------------------------------------------------
 -----------------------                   LOAD IMAGES                  -----------------------
 ----------------------------------------------------------------------------------------------
-createPictureBundle :: IO C.CPictureBundle
-createPictureBundle = do 
+loadGraphics :: IO C.CGraphics
+loadGraphics = do 
+  font        <- VTools.loadFontFile' fontPath
   spriteSheet <- loadSpriteSheet
 
   let damagedWalls  = loadInnerWallsDamaged spriteSheet
@@ -49,10 +53,11 @@ createPictureBundle = do
       outerWalls'   = Map.fromList $ zip [minBound .. maxBound] outerWalls
       intactWalls'  = Map.fromList $ zip [minBound .. maxBound] intactWalls
 
-  let picBundle = C.CPictureBundle
+  let graphics = C.CGraphics
         { C.damagedInnerWallPics = damagedWalls'
         , C.exitPic              = exit
         , C.floorPics            = floor'
+        , C.font                 = font
         , C.fruitPic             = fruit
         , C.intactInnerWallPics  = intactWalls'
         , C.outerWallPics        = outerWalls'
@@ -66,7 +71,7 @@ createPictureBundle = do
         , C.zombieIdlePics       = zombieIdle
         }
 
-  return picBundle
+  return graphics
 
 
 loadSpriteSheet :: IO CP.DynamicImage

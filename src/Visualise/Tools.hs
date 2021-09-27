@@ -5,25 +5,33 @@
 module Visualise.Tools (
   -- * Convenience wrappers
   fromDynamicImage',
+  loadFontFile',
   readImage',
   translate',
   -- * Image cropping
   cropDynamicImage,
   -- * Coordinate conversion
   positionToCoords,
-  positionToCoords'
+  positionToCoords',
+  -- * Draw text with font
+  drawText
 )
 where
 
 import Codec.Picture.Extra  (crop)
-import Graphics.Gloss.Juicy (fromDynamicImage)
+import Graphics.Gloss.Juicy (fromDynamicImage, fromImageRGBA8)
 
-import qualified Apecs.Gloss   as AG
-import qualified Codec.Picture as CP
-import qualified Data.Maybe    as Maybe
-import qualified Linear        as L
+import qualified Apecs                       as A
+import qualified Apecs.Gloss                 as AG
+import qualified Codec.Picture               as CP
+import qualified Codec.Picture.Types         as PT
+import qualified Data.Maybe                  as Maybe
+import qualified Graphics.Rasterific         as Rast
+import qualified Graphics.Rasterific.Texture as RastT
+import qualified Graphics.Text.TrueType      as TT
+import qualified Linear                      as L
 
-import qualified Components    as C
+import qualified Components                  as C
 
 
 ----------------------------------------------------------------------------------------------
@@ -46,6 +54,17 @@ fromDynamicImage' :: CP.DynamicImage -> AG.Picture
 fromDynamicImage' img = Maybe.fromMaybe
   (error "fromDynamicImage':: Failed to convert DynamicImage to Picture!") 
   (fromDynamicImage img)
+
+
+-- | Unsafe version of FontyFruity's Graphics.Text.TrueType.loadFontFile
+-- Throws an error if the font cannot be loaded.
+loadFontFile' :: FilePath -> IO TT.Font
+loadFontFile' filePath = do 
+  font <- TT.loadFontFile filePath
+
+  case font of 
+    Left e  -> error e
+    Right f -> return f
 
 
 translate' :: AG.Point -> AG.Picture -> AG.Picture
@@ -97,4 +116,30 @@ positionToCoords (xOffset, yOffset) (cellWidth, cellHeight) (C.CPosition (L.V2 x
 
 
 positionToCoords' = positionToCoords (0.0, 0.0) (C.spriteWidth, C.spriteHeight)
+----------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------
+-----------------------               DRAW TEXT WITH FONT             -----------------------
+----------------------------------------------------------------------------------------------
+drawText 
+  :: (Int, Int)
+  -> Rast.Point
+  -> String
+  -> C.System' AG.Picture
+drawText (renderWidth, renderHeight) point text = do 
+  font <- C.font <$> A.get A.global 
+
+  let background = PT.PixelRGBA8 255 0 0 100         -- transparent
+      textColor  = PT.PixelRGBA8 255 255 255 255  -- white
+      fontSize   = Rast.PointSize 16
+
+      pic = Rast.renderDrawing renderWidth renderHeight background
+          . Rast.withTexture (RastT.uniformTexture textColor) 
+          . Rast.printTextAt font fontSize point
+          $ text
+
+      pic' = fromImageRGBA8 pic
+
+  return pic'
 ----------------------------------------------------------------------------------------------

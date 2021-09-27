@@ -13,12 +13,12 @@ import qualified Visualise.Load     as Load
 
 main :: IO ()
 main = do
-  picBundle <- Load.createPictureBundle
+  graphics <- Load.loadGraphics
 
   w <- C.initWorld
   
   A.runWith w $ do
-    A.set A.global picBundle
+    A.set A.global graphics
     SInit.startNewGame
 
     AG.play 
