@@ -125,14 +125,14 @@ positionToCoords' = positionToCoords (0.0, 0.0) (C.spriteWidth, C.spriteHeight)
 drawText 
   :: (Int, Int)
   -> Rast.Point
+  -> Rast.PointSize
   -> String
   -> C.System' AG.Picture
-drawText (renderWidth, renderHeight) point text = do 
+drawText (renderWidth, renderHeight) point fontSize text = do 
   font <- C.font <$> A.get A.global 
 
-  let background = PT.PixelRGBA8 255 0 0 100         -- transparent
+  let background = PT.PixelRGBA8 255 0 0 100      -- transparent
       textColor  = PT.PixelRGBA8 255 255 255 255  -- white
-      fontSize   = Rast.PointSize 16
 
       pic = Rast.renderDrawing renderWidth renderHeight background
           . Rast.withTexture (RastT.uniformTexture textColor) 

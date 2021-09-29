@@ -22,13 +22,13 @@ module Components (
   CFloor(..),
   CFood(..),
   CFoodPoints(..),
+  CGraphics(..),
   CHealth(..),
   CInnerWall(..),
   CInnerWallPic(..),
   CLevel(..),
   CNutrition(..),
   COuterWall(..),
-  CGraphics(..),
   CPlayer(..),
   CPointsChange(..),
   CPosition(..),
@@ -158,7 +158,7 @@ instance Monoid CConfig where
     , cellHeight         = spriteHeight
     , exitPosition       = CPosition $ L.V2 7 7 
     , startPosition      = CPosition $ L.V2 0 0
-    , foodPointsPosition = CPosition $ L.V2 2 (-1)
+    , foodPointsPosition = CPosition $ L.V2 4 (-1)
     , foodRange          = (1, 5)
     , innerWallsRange    = (5, 9)
     , foodPoints         = 100
@@ -191,6 +191,65 @@ newtype CFoodPoints = CFoodPoints Int deriving (Show, Num)
 instance Semigroup CFoodPoints where (<>) = (+)
 instance Monoid CFoodPoints where mempty = 0
 instance Component CFoodPoints where type Storage CFoodPoints = Global CFoodPoints
+
+-- CGraphics
+data CGraphics = CGraphics 
+  { damagedInnerWallPics  :: Map.Map InnerWall AG.Picture 
+  , exitPic               :: AG.Picture 
+  , floorPics             :: Map.Map Floor AG.Picture
+  , font                  :: TT.Font
+  , fruitPic              :: AG.Picture
+  , intactInnerWallPics   :: Map.Map InnerWall AG.Picture 
+  , outerWallPics         :: Map.Map OuterWall AG.Picture
+  , playerAttackPics      :: [AG.Picture]
+  , playerHurtPics        :: [AG.Picture]
+  , playerIdlePics        :: [AG.Picture]
+  , sodaPic               :: AG.Picture
+  , vampireAttackPics     :: [AG.Picture]
+  , vampireIdlePics       :: [AG.Picture]
+  , zombieAttackPics      :: [AG.Picture]
+  , zombieIdlePics        :: [AG.Picture]
+  }
+
+instance Semigroup CGraphics where
+  g1 <> g2 = CGraphics
+    { damagedInnerWallPics = damagedInnerWallPics g1 <> damagedInnerWallPics g2
+    , exitPic              = exitPic              g1 <> exitPic              g2
+    , floorPics            = floorPics            g1 <> floorPics            g2
+    , font                 = font g2 -- TODO: Think
+    , fruitPic             = fruitPic             g1 <> fruitPic             g2
+    , intactInnerWallPics  = intactInnerWallPics  g1 <> intactInnerWallPics  g2
+    , outerWallPics        = outerWallPics        g1 <> outerWallPics        g2
+    , playerAttackPics     = playerAttackPics     g1 <> playerAttackPics     g2
+    , playerHurtPics       = playerHurtPics       g1 <> playerHurtPics       g2
+    , playerIdlePics       = playerIdlePics       g1 <> playerIdlePics       g2
+    , sodaPic              = sodaPic              g1 <> sodaPic              g2
+    , vampireAttackPics    = vampireAttackPics    g1 <> vampireAttackPics    g2
+    , vampireIdlePics      = vampireIdlePics      g1 <> vampireIdlePics      g2
+    , zombieAttackPics     = zombieAttackPics     g1 <> zombieAttackPics     g2
+    , zombieIdlePics       = zombieIdlePics       g1 <> zombieIdlePics       g2
+    }
+
+instance Monoid CGraphics where
+  mempty = CGraphics
+    { damagedInnerWallPics = mempty
+    , exitPic              = mempty
+    , floorPics            = mempty
+    , font                 = undefined  -- TODO: Think
+    , fruitPic             = mempty
+    , intactInnerWallPics  = mempty 
+    , outerWallPics        = mempty
+    , playerAttackPics     = mempty
+    , playerHurtPics       = mempty
+    , playerIdlePics       = mempty
+    , sodaPic              = mempty
+    , vampireAttackPics    = mempty
+    , vampireIdlePics      = mempty
+    , zombieAttackPics     = mempty
+    , zombieIdlePics       = mempty
+    }
+
+instance Component CGraphics where type Storage CGraphics = Global CGraphics 
 
 -- CHealth
 data CHealth = CHealth 
@@ -229,65 +288,6 @@ instance Component CNutrition where type Storage CNutrition = Map CNutrition
 -- COuterWall
 newtype COuterWall = COuterWall OuterWall deriving (Show) 
 instance Component COuterWall where type Storage COuterWall = Map COuterWall
-
--- CGraphics
-data CGraphics = CGraphics 
-  { damagedInnerWallPics  :: Map.Map InnerWall AG.Picture 
-  , exitPic               :: AG.Picture 
-  , floorPics             :: Map.Map Floor AG.Picture
-  , font                  :: TT.Font
-  , fruitPic              :: AG.Picture
-  , intactInnerWallPics   :: Map.Map InnerWall AG.Picture 
-  , outerWallPics         :: Map.Map OuterWall AG.Picture
-  , playerAttackPics      :: [AG.Picture]
-  , playerHurtPics        :: [AG.Picture]
-  , playerIdlePics        :: [AG.Picture]
-  , sodaPic               :: AG.Picture
-  , vampireAttackPics     :: [AG.Picture]
-  , vampireIdlePics       :: [AG.Picture]
-  , zombieAttackPics      :: [AG.Picture]
-  , zombieIdlePics        :: [AG.Picture]
-  }
-
-instance Semigroup CGraphics where
-  pb1 <> pb2 = CGraphics
-    { damagedInnerWallPics = damagedInnerWallPics pb1 <> damagedInnerWallPics pb2
-    , exitPic              = exitPic              pb1 <> exitPic              pb2
-    , floorPics            = floorPics            pb1 <> floorPics            pb2
-    , font                 = font pb2 -- TODO: Think
-    , fruitPic             = fruitPic             pb1 <> fruitPic             pb2
-    , intactInnerWallPics  = intactInnerWallPics  pb1 <> intactInnerWallPics  pb2
-    , outerWallPics        = outerWallPics        pb1 <> outerWallPics        pb2
-    , playerAttackPics     = playerAttackPics     pb1 <> playerAttackPics     pb2
-    , playerHurtPics       = playerHurtPics       pb1 <> playerHurtPics       pb2
-    , playerIdlePics       = playerIdlePics       pb1 <> playerIdlePics       pb2
-    , sodaPic              = sodaPic              pb1 <> sodaPic              pb2
-    , vampireAttackPics    = vampireAttackPics    pb1 <> vampireAttackPics    pb2
-    , vampireIdlePics      = vampireIdlePics      pb1 <> vampireIdlePics      pb2
-    , zombieAttackPics     = zombieAttackPics     pb1 <> zombieAttackPics     pb2
-    , zombieIdlePics       = zombieIdlePics       pb1 <> zombieIdlePics       pb2
-    }
-
-instance Monoid CGraphics where
-  mempty = CGraphics
-    { damagedInnerWallPics = mempty
-    , exitPic              = mempty
-    , floorPics            = mempty
-    , font                 = undefined  -- TODO: Think
-    , fruitPic             = mempty
-    , intactInnerWallPics  = mempty 
-    , outerWallPics        = mempty
-    , playerAttackPics     = mempty
-    , playerHurtPics       = mempty
-    , playerIdlePics       = mempty
-    , sodaPic              = mempty
-    , vampireAttackPics    = mempty
-    , vampireIdlePics      = mempty
-    , zombieAttackPics     = mempty
-    , zombieIdlePics       = mempty
-    }
-
-instance Component CGraphics where type Storage CGraphics = Global CGraphics 
 
 -- CPlayer
 data CPlayer = CPlayer deriving (Show) 

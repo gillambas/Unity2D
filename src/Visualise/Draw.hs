@@ -26,7 +26,7 @@ draw = do
 drawLevelIntro :: C.System' AG.Picture
 drawLevelIntro = do 
   level :: C.CLevel <- A.get A.global 
-  VTools.drawText (200, 45) (Rast.V2 10 35) (show level)
+  VTools.drawText (200, 45) (Rast.V2 10 35) (Rast.PointSize 16) (show level)
 
 
 drawGameOver :: C.System' AG.Picture
@@ -37,14 +37,14 @@ drawGameOver = do
                 then mconcat ["After ", show l, " day, you starved."]
                 else mconcat ["After ", show l, " days, you starved."]
 
-  VTools.drawText (650, 45) (Rast.V2 10 35) message
+  VTools.drawText (650, 45) (Rast.V2 10 35) (Rast.PointSize 16) message
 
 
 drawGame :: C.System' AG.Picture
 drawGame = do
-  config                    <- A.get A.global
+  config                   <- A.get A.global
   graphics                 <- A.get A.global
-  C.CBoardPicture boardPic  <- A.get A.global
+  C.CBoardPicture boardPic <- A.get A.global
 
   player     <- AG.foldDraw $ \(C.CPlayer, pos, C.CAnimation _ sprites index _) -> VTools.translate' (VTools.positionToCoords' pos) (sprites !! index)
   enemies    <- AG.foldDraw $ \(C.CEnemy _, pos, C.CAnimation _ sprites index _) -> VTools.translate' (VTools.positionToCoords' pos) (sprites !! index)
@@ -54,7 +54,8 @@ drawGame = do
   C.CFoodPoints   fp <- A.get A.global
   C.CPointsChange pc <- A.get A.global
 
-  let foodPoints = AG.color AG.white . VTools.translate' (VTools.positionToCoords' (C.foodPointsPosition config)) . AG.scale 0.12 0.12 . AG.text $ mconcat [pc, "Food: ", show fp]
+  foodPoints <- VTools.translate' (VTools.positionToCoords' (C.foodPointsPosition config)) 
+                <$> VTools.drawText (325, 45) (Rast.V2 10 35) (Rast.PointSize 12) (mconcat [pc, "Food: ", show fp])
   
   return $ mconcat [boardPic, food, enemies, innerWalls, player, foodPoints]
 
