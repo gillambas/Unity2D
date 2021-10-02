@@ -34,11 +34,21 @@ drawGameOver :: C.System' AG.Picture
 drawGameOver = do 
   C.CLevel l <- A.get A.global
 
-  let message = if   l == 1
-                then mconcat ["After ", show l, " day, you starved."]
-                else mconcat ["After ", show l, " days, you starved."]
+  let message' = if   l == 1
+                 then mconcat ["After ", show l, " day, you starved."]
+                 else mconcat ["After ", show l, " days, you starved."]
 
-  VTools.drawText (650, 45) (Rast.V2 10 35) (Rast.PointSize 16) message
+      drawText' = VTools.drawText (650, 45) (Rast.V2 10 35) (Rast.PointSize 16)
+
+  message <-  drawText' message'
+
+  option1 <-  AG.translate 0.0 (-50.0)
+          <$> drawText' "Press enter to start new game."
+
+  option2 <-  AG.translate 0.0 (-100.0)
+          <$> drawText' "Press escape to exit game."
+
+  return $ mconcat [message, option1, option2]
 
 
 drawGame :: C.System' AG.Picture
@@ -58,8 +68,8 @@ drawGame = do
                            then C.CPosition $ L.V2 6 (-1)
                            else C.CPosition $ L.V2 5 (-1)
 
-  foodPoints <- VTools.translate' (VTools.positionToCoords' foodPointsPosition) 
-                <$> VTools.drawText (325, 45) (Rast.V2 10 35) (Rast.PointSize 12) (mconcat [pc, "Food: ", show fp])
+  foodPoints <-  VTools.translate' (VTools.positionToCoords' foodPointsPosition) 
+             <$> VTools.drawText (325, 45) (Rast.V2 10 35) (Rast.PointSize 12) (mconcat [pc, "Food: ", show fp])
   
   return $ mconcat [boardPic, food, enemies, innerWalls, player, foodPoints]
 
