@@ -131,7 +131,7 @@ drawText
 drawText (renderWidth, renderHeight) point fontSize text = do 
   font <- C.font <$> A.get A.global 
 
-  let background = PT.PixelRGBA8 255 0 0 100      -- transparent
+  let background = PT.PixelRGBA8 0 0 0 0          -- transparent
       textColor  = PT.PixelRGBA8 255 255 255 255  -- white
 
       pic = Rast.renderDrawing renderWidth renderHeight background

@@ -8,6 +8,7 @@ import qualified Apecs               as A
 import qualified Apecs.Gloss         as AG
 import qualified Data.Map            as Map
 import qualified Graphics.Rasterific as Rast
+import qualified Linear              as L
 
 import qualified Components          as C
 import qualified Visualise.Tools     as VTools
@@ -42,7 +43,6 @@ drawGameOver = do
 
 drawGame :: C.System' AG.Picture
 drawGame = do
-  config                   <- A.get A.global
   graphics                 <- A.get A.global
   C.CBoardPicture boardPic <- A.get A.global
 
@@ -54,7 +54,11 @@ drawGame = do
   C.CFoodPoints   fp <- A.get A.global
   C.CPointsChange pc <- A.get A.global
 
-  foodPoints <- VTools.translate' (VTools.positionToCoords' (C.foodPointsPosition config)) 
+  let foodPointsPosition = if   pc == mempty
+                           then C.CPosition $ L.V2 6 (-1)
+                           else C.CPosition $ L.V2 5 (-1)
+
+  foodPoints <- VTools.translate' (VTools.positionToCoords' foodPointsPosition) 
                 <$> VTools.drawText (325, 45) (Rast.V2 10 35) (Rast.PointSize 12) (mconcat [pc, "Food: ", show fp])
   
   return $ mconcat [boardPic, food, enemies, innerWalls, player, foodPoints]

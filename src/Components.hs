@@ -138,7 +138,6 @@ data CConfig = CConfig
   , cellHeight         :: Int
   , exitPosition       :: CPosition
   , startPosition      :: CPosition
-  , foodPointsPosition :: CPosition
   , foodRange          :: (Int, Int)
   , innerWallsRange    :: (Int, Int)
   , foodPoints         :: Int
@@ -158,7 +157,6 @@ instance Monoid CConfig where
     , cellHeight         = spriteHeight
     , exitPosition       = CPosition $ L.V2 7 7 
     , startPosition      = CPosition $ L.V2 0 0
-    , foodPointsPosition = CPosition $ L.V2 4 (-1)
     , foodRange          = (1, 5)
     , innerWallsRange    = (5, 9)
     , foodPoints         = 100
