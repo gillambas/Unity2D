@@ -1,14 +1,14 @@
 module Main where
 
-import qualified Apecs              as A
-import qualified Apecs.Gloss        as AG
+import qualified Apecs                as A
+import qualified Apecs.Gloss          as AG
 
-import qualified Components         as C
-import qualified EventHandling      as EH
-import qualified Step               as Step
-import qualified Systems.Initialise as SInit
-import qualified Visualise.Draw     as Draw
-import qualified Visualise.Load     as Load
+import qualified Components           as C
+import qualified HandleInput.Keyboard as HIK
+import qualified Step                 as Step
+import qualified Systems.Initialise   as SInit
+import qualified Visualise.Draw       as Draw
+import qualified Visualise.Load       as Load
 
 
 main :: IO ()
@@ -26,5 +26,5 @@ main = do
       AG.black
       60
       Draw.draw
-      EH.eventHandler
+      HIK.eventHandler
       Step.stepper

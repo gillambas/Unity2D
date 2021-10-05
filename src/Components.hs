@@ -43,6 +43,7 @@ module Components (
   Nutrition(..),
   OuterWall(..),
   Screen(..),
+  SwitchInput(..),
   -- * Type Synonyms
   EnemyComponents,
   ExitComponents,
@@ -109,6 +110,17 @@ data OuterWall = OW1 | OW2 | OW3 deriving (Bounded, Enum, Eq, Ord, Show)
 data Nutrition = Nutrition {soda :: Int, fruit :: Int} deriving (Show)
 
 data Screen = LevelIntro | Game | GameOver deriving (Eq, Show)
+
+data SwitchInput
+  = Up
+  | Down
+  | Left
+  | Right
+  | Attack
+  | Restart
+  | Exit
+  | None
+  deriving (Eq, Show)
 ----------------------------------------------------------------------------------------------
 
 

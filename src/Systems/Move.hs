@@ -44,7 +44,7 @@ moveEnemy = do
   A.set A.global (C.CSkipMove (not sm))
 
 
-movePlayer :: AG.Key -> C.System' ()
+movePlayer :: AG.SpecialKey -> C.System' ()
 movePlayer key = do
   enemies    <- SGet.getEnemyPositions
   innerWalls <- SGet.getInnerWallPositions
@@ -52,11 +52,11 @@ movePlayer key = do
 
   let occupiedPositions = enemies <> innerWalls <> outerWalls
       displacement = case key of 
-        AG.SpecialKey AG.KeyLeft  -> C.CPosition $ L.V2 (-1) 0
-        AG.SpecialKey AG.KeyRight -> C.CPosition $ L.V2 1 0 
-        AG.SpecialKey AG.KeyUp    -> C.CPosition $ L.V2 0 1 
-        AG.SpecialKey AG.KeyDown  -> C.CPosition $ L.V2 0 (-1)
-        _                         -> C.CPosition $ L.V2 0 0
+        AG.KeyLeft  -> C.CPosition $ L.V2 (-1) 0
+        AG.KeyRight -> C.CPosition $ L.V2 1 0 
+        AG.KeyUp    -> C.CPosition $ L.V2 0 1 
+        AG.KeyDown  -> C.CPosition $ L.V2 0 (-1)
+        _           -> C.CPosition $ L.V2 0 0
 
   AS.cmapIf
     (\(pos, C.CFoodPoints fp) -> (pos + displacement) `notElem` occupiedPositions && fp > 0)

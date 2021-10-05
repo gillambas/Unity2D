@@ -38,6 +38,7 @@ dependencies:
   - linear
   - random
   - Rasterific
+  - switch
 
 library:
   source-dirs: src

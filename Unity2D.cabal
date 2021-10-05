@@ -28,7 +28,8 @@ source-repository head
 library
   exposed-modules:
       Components
-      EventHandling
+      HandleInput.Keyboard
+      HandleInput.Switch
       Step
       Systems.Attack
       Systems.Check
@@ -62,6 +63,7 @@ library
     , gloss-juicy
     , linear
     , random
+    , switch
   default-language: Haskell2010
 
 executable Unity2D-exe
@@ -90,6 +92,7 @@ executable Unity2D-exe
     , gloss-juicy
     , linear
     , random
+    , switch
   default-language: Haskell2010
 
 test-suite Unity2D-test
@@ -119,4 +122,5 @@ test-suite Unity2D-test
     , gloss-juicy
     , linear
     , random
+    , switch
   default-language: Haskell2010

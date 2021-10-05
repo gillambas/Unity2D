@@ -1,4 +1,4 @@
-module EventHandling (
+module HandleInput.Keyboard (
   eventHandler
 )
 where
@@ -27,19 +27,19 @@ eventHandler event = do
 handleGame :: AG.Event -> C.System' ()
 handleGame = \case
   -- Move player
-  (AG.EventKey key@(AG.SpecialKey AG.KeyLeft ) AG.Down _ _) -> SMove.movePlayer key
-  (AG.EventKey key@(AG.SpecialKey AG.KeyRight) AG.Down _ _) -> SMove.movePlayer key
-  (AG.EventKey key@(AG.SpecialKey AG.KeyUp   ) AG.Down _ _) -> SMove.movePlayer key
-  (AG.EventKey key@(AG.SpecialKey AG.KeyDown ) AG.Down _ _) -> SMove.movePlayer key
+  (AG.EventKey (AG.SpecialKey AG.KeyLeft ) AG.Down _ _) -> SMove.movePlayer AG.KeyLeft
+  (AG.EventKey (AG.SpecialKey AG.KeyRight) AG.Down _ _) -> SMove.movePlayer AG.KeyRight
+  (AG.EventKey (AG.SpecialKey AG.KeyUp   ) AG.Down _ _) -> SMove.movePlayer AG.KeyUp
+  (AG.EventKey (AG.SpecialKey AG.KeyDown ) AG.Down _ _) -> SMove.movePlayer AG.KeyDown
 
   -- Player attacks
-  (AG.EventKey key@(AG.SpecialKey AG.KeySpace) AG.Down _ _) -> SAttack.playerAttack
+  (AG.EventKey (AG.SpecialKey AG.KeySpace) AG.Down _ _) -> SAttack.playerAttack
 
   -- Terminate game
-  (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _)       -> A.liftIO exitSuccess
+  (AG.EventKey (AG.SpecialKey AG.KeyEsc) AG.Down _ _)   -> A.liftIO exitSuccess
 
   -- Unsupported key
-  _                                                         -> return ()
+  _                                                     -> return ()
 
 
 handleLevelIntro :: AG.Event -> C.System' ()

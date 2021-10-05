@@ -46,6 +46,13 @@ packages:
       sha256: 1591d9d1034f19cd38fbda525969f805b5ca083b45da85602cf2b04c1a82f640
   original:
     hackage: time-1.10@sha256:536801b30aa2ce66da07cb19847827662650907efb2af4c8bef0a6276445075f,5738
+- completed:
+    hackage: switch-0.1.0.0@sha256:e70d71b13c3b7640f48f21933f1cf0e8fde3c013b015b1db69386fcf7cc3cb25,3007
+    pantry-tree:
+      size: 1053
+      sha256: 28d65a18cdb26a21522545c6d1e0cad462bfc243cac9484050015eedfc9d822f
+  original:
+    hackage: switch-0.1.0.0@sha256:e70d71b13c3b7640f48f21933f1cf0e8fde3c013b015b1db69386fcf7cc3cb25,3007
 snapshots:
 - completed:
     size: 587113
