@@ -62,6 +62,8 @@ stepGame dT = do
   switchInputs' <- mapM Switch.interpretSwitchInput switchInputs
   mapM_ Switch.handleSwitchInput switchInputs'
 
+  A.liftIO $ print switchInputs'
+
   triggerEvery dT 2.0 0.0 SMove.moveEnemy
   triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
 

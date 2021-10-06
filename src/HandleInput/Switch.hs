@@ -22,7 +22,6 @@ import qualified Systems.Initialise     as SInit
 import qualified Systems.Move           as SMove
 
 
-
 getSwitchInput :: Float -> IO [NS.Input]
 getSwitchInput dT = do 
   let millisecs = floor $ dT * 1000.0
@@ -30,13 +29,7 @@ getSwitchInput dT = do
   NS.withConsole $ \switch -> do
     infosL <- NS.getControllerInfos @'NS.LeftJoyCon switch  -- TODO: Don't specify controller and remove pragmas
 
-    maybeInputs <- mapM (flip NS.withController $ NS.getTimeoutInput millisecs) infosL
-
-    let inputs = Maybe.catMaybes maybeInputs
-
-    print inputs
-
-    return inputs 
+    Maybe.catMaybes <$> mapM (flip NS.withController $ NS.getTimeoutInput millisecs) infosL
 
     -- <- mapM ((flip NS.withController) NS.getInput) infosR
     -- <- mapM ((flip NS.withController) NS.getInput) infosP
