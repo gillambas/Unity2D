@@ -2,18 +2,16 @@
 {-# LANGUAGE TypeApplications #-}
 
 module HandleInput.Switch (
-  getSwitchInput,
-  handleSwitchInput,
-  interpretSwitchInput
+  handleSwitch
 )
 where 
 
-import Control.Monad (forM)
-import System.Exit   (exitSuccess)
+import Control.Monad       (forM_, (>=>))
+import Control.Monad.Extra (whenJust)
+import System.Exit         (exitSuccess)
 
 import qualified Apecs                  as A
 import qualified Apecs.Gloss            as AG
-import qualified Data.Maybe             as Maybe
 import qualified Device.Nintendo.Switch as NS
 
 import qualified Components             as C
@@ -22,30 +20,24 @@ import qualified Systems.Initialise     as SInit
 import qualified Systems.Move           as SMove
 
 
-getSwitchInput :: Float -> IO [NS.Input]
-getSwitchInput dT = do 
+handleSwitch :: Float -> C.System' ()
+handleSwitch dT = do 
   let millisecs = floor $ dT * 1000.0
 
-  NS.withConsole $ \switch -> do
-    infosL <- NS.getControllerInfos @'NS.LeftJoyCon switch  -- TODO: Don't specify controller and remove pragmas
+  switch <- A.liftIO NS.init 
 
-    Maybe.catMaybes <$> mapM (flip NS.withController $ NS.getTimeoutInput millisecs) infosL
+  infosL <- A.liftIO $ NS.getControllerInfos @'NS.LeftJoyCon switch
 
-    -- <- mapM ((flip NS.withController) NS.getInput) infosR
-    -- <- mapM ((flip NS.withController) NS.getInput) infosP
+  forM_ infosL $ \info -> do 
+    controller <- A.liftIO $ NS.connect info
 
+    input <- A.liftIO $ NS.getTimeoutInput millisecs controller
 
+    whenJust input (interpretSwitchInput >=> handleSwitchInput)
 
-    --  NS.withController info NS.getInput -- $ \controller -> do
-        -- TODO: Set mode to simple
-        --setInputMode Simple controller
-        --ackInputMode controller -- ack
+    A.liftIO $ NS.disconnect controller
 
-        -- TODO: Stop flashing player lights 
-        --setPlayerLights flashAll controller
-        --void $ getInput controller -- ack
-
-        --NS.getInput controller
+  A.liftIO $ NS.exit switch 
 
 
 handleSwitchInput :: C.SwitchInput -> C.System' ()

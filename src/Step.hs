@@ -58,12 +58,8 @@ stepGame dT = do
 
   triggerEvery dT 3.0 0.0 SRem.removePointsChange
 
-  switchInputs  <- A.liftIO $ Switch.getSwitchInput dT
-  switchInputs' <- mapM Switch.interpretSwitchInput switchInputs
-  mapM_ Switch.handleSwitchInput switchInputs'
-
-  A.liftIO $ print switchInputs'
-
+  Switch.handleSwitch dT
+ 
   triggerEvery dT 2.0 0.0 SMove.moveEnemy
   triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
 
