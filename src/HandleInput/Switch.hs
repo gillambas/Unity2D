@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeApplications #-}
 
 module HandleInput.Switch (
+  loadSwitchControllers,
   handleSwitch
 )
 where 
@@ -24,20 +25,15 @@ handleSwitch :: Float -> C.System' ()
 handleSwitch dT = do 
   let millisecs = floor $ dT * 1000.0
 
-  switch <- A.liftIO NS.init 
+  C.CSwitchControllers leftContrs rightContrs proContrs <- A.get A.global 
 
-  infosL <- A.liftIO $ NS.getControllerInfos @'NS.LeftJoyCon switch
-
-  forM_ infosL $ \info -> do 
-    controller <- A.liftIO $ NS.connect info
-
-    input <- A.liftIO $ NS.getTimeoutInput millisecs controller
-
+  forM_ leftContrs $ \l -> do 
+    input <- A.liftIO $ NS.getTimeoutInput millisecs l
     whenJust input (interpretSwitchInput >=> handleSwitchInput)
 
-    A.liftIO $ NS.disconnect controller
-
-  A.liftIO $ NS.exit switch 
+  forM_ rightContrs $ \r -> do 
+    input <- A.liftIO $ NS.getTimeoutInput millisecs r
+    whenJust input (interpretSwitchInput >=> handleSwitchInput)
 
 
 handleSwitchInput :: C.SwitchInput -> C.System' ()
@@ -80,3 +76,15 @@ interpretStickDirection (NS.Discrete d) = case d of
   NS.Right -> C.Right
   NS.Down  -> C.Down
   _        -> C.None
+
+
+loadSwitchControllers :: NS.Console -> IO C.CSwitchControllers
+loadSwitchControllers console = do 
+  leftCon  <- mapM NS.connect =<< NS.getControllerInfos console
+  rightCon <- mapM NS.connect =<< NS.getControllerInfos console
+  proCon   <- mapM NS.connect =<< NS.getControllerInfos console
+
+  return C.CSwitchControllers
+    { C.leftJoyCon    = leftCon
+    , C.rightJoyCon   = rightCon
+    , C.proController = proCon }

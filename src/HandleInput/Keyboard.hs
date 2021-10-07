@@ -12,7 +12,6 @@ import qualified Components           as C
 import qualified Systems.Attack       as SAttack
 import qualified Systems.Initialise   as SInit
 import qualified Systems.Move         as SMove
-import qualified HandleInput.Switch   as Switch
 
 
 eventHandler :: AG.Event -> C.System' ()
