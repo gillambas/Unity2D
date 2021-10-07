@@ -14,31 +14,25 @@ import qualified Visualise.Load         as Load
 
 
 main :: IO ()
-main = do
-  graphics <- Load.loadGraphics
+main =
+  NS.withConsole $ \switch -> do 
+    graphics <- Load.loadGraphics
+    switchControllers <- Switch.connectSwitch switch
 
-  switch <- NS.init
-  switchControllers <- Switch.loadSwitchControllers switch
+    w <- C.initWorld
 
-  w <- C.initWorld
-  
-  A.runWith w $ do
-    A.set A.global graphics
-    A.set A.global switchControllers
+    A.runWith w $ do
+      A.set A.global graphics
+      A.set A.global switchControllers
 
-    SInit.startNewGame
+      SInit.startNewGame
 
-    AG.play 
-      AG.FullScreen
-      AG.black
-      60
-      Draw.draw
-      HIK.eventHandler
-      Step.stepper
+      AG.play
+        AG.FullScreen
+        AG.black
+        60
+        Draw.draw
+        HIK.eventHandler
+        Step.stepper
 
-    C.CSwitchControllers left right pro <- A.get A.global 
-    A.liftIO $ mapM_ NS.disconnect left 
-    A.liftIO $ mapM_ NS.disconnect right 
-    A.liftIO $ mapM_ NS.disconnect pro
-
-  NS.exit switch
+      Switch.disconnectSwitch

@@ -1,8 +1,6 @@
-{-# LANGUAGE DataKinds        #-}
-{-# LANGUAGE TypeApplications #-}
-
 module HandleInput.Switch (
-  loadSwitchControllers,
+  connectSwitch,
+  disconnectSwitch,
   handleSwitch
 )
 where 
@@ -78,13 +76,30 @@ interpretStickDirection (NS.Discrete d) = case d of
   _        -> C.None
 
 
-loadSwitchControllers :: NS.Console -> IO C.CSwitchControllers
-loadSwitchControllers console = do 
-  leftCon  <- mapM NS.connect =<< NS.getControllerInfos console
-  rightCon <- mapM NS.connect =<< NS.getControllerInfos console
-  proCon   <- mapM NS.connect =<< NS.getControllerInfos console
+connectSwitch :: NS.Console -> IO C.CSwitchControllers
+connectSwitch console = do 
+  leftCon  <- mapMM NS.connect (NS.getControllerInfos console)
+  rightCon <- mapMM NS.connect (NS.getControllerInfos console)
+  proCon   <- mapMM NS.connect (NS.getControllerInfos console)
+
+  mapM_ (NS.setInputMode NS.Simple) leftCon
+  mapM_ (NS.setInputMode NS.Simple) rightCon
 
   return C.CSwitchControllers
     { C.leftJoyCon    = leftCon
     , C.rightJoyCon   = rightCon
     , C.proController = proCon }
+
+
+disconnectSwitch :: C.System' ()
+disconnectSwitch = do 
+  C.CSwitchControllers left right pro <- A.get A.global 
+  A.liftIO $ mapM_ NS.disconnect left 
+  A.liftIO $ mapM_ NS.disconnect right 
+  A.liftIO $ mapM_ NS.disconnect pro
+
+
+-- Copied from Agda.Utils.Monad
+-- (https://hackage.haskell.org/package/Agda-2.6.2/docs/Agda-Utils-Monad.html#v:mapMM)
+mapMM :: (Traversable t, Monad m) => (a -> m b) -> m (t a) -> m (t b)
+mapMM f mxs = mapM f =<< mxs
