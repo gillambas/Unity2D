@@ -331,12 +331,11 @@ instance Component CSkipMove where type Storage CSkipMove = Global CSkipMove
 
 -- CSwitchControllers
 data CSwitchControllers = CSwitchControllers
-  { leftJoyCon    :: [NS.Controller 'NS.LeftJoyCon   ]
-  , rightJoyCon   :: [NS.Controller 'NS.RightJoyCon  ]
-  , proController :: [NS.Controller 'NS.ProController]
+  { leftJoyCon    :: [NS.Controller 'NS.LeftJoyCon  ]
+  , rightJoyCon   :: [NS.Controller 'NS.RightJoyCon ]
   }
 instance Semigroup CSwitchControllers where (<>) _ c2 = c2
-instance Monoid CSwitchControllers where mempty = CSwitchControllers [] [] []
+instance Monoid CSwitchControllers where mempty = CSwitchControllers [] []
 instance Component CSwitchControllers where type Storage CSwitchControllers = Global CSwitchControllers
 
 -- CTime

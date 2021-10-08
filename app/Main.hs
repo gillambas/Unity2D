@@ -5,7 +5,7 @@ import qualified Apecs.Gloss            as AG
 import qualified Device.Nintendo.Switch as NS
 
 import qualified Components             as C
-import qualified HandleInput.Keyboard   as HIK
+import qualified HandleInput.Keyboard   as Keyboard
 import qualified HandleInput.Switch     as Switch
 import qualified Step                   as Step
 import qualified Systems.Initialise     as SInit
@@ -32,7 +32,7 @@ main =
         AG.black
         60
         Draw.draw
-        HIK.eventHandler
+        Keyboard.eventHandler
         Step.stepper
 
       Switch.disconnectSwitch

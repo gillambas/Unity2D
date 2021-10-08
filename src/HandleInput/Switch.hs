@@ -5,7 +5,7 @@ module HandleInput.Switch (
 )
 where 
 
-import Control.Monad       (forM_, (>=>))
+import Control.Monad       ((>=>))
 import Control.Monad.Extra (whenJust)
 import System.Exit         (exitSuccess)
 
@@ -23,15 +23,16 @@ handleSwitch :: Float -> C.System' ()
 handleSwitch dT = do 
   let millisecs = floor $ dT * 1000.0
 
-  C.CSwitchControllers leftContrs rightContrs proContrs <- A.get A.global 
+  C.CSwitchControllers leftContrs rightContrs <- A.get A.global 
 
-  forM_ leftContrs $ \l -> do 
-    input <- A.liftIO $ NS.getTimeoutInput millisecs l
-    whenJust input (interpretSwitchInput >=> handleSwitchInput)
+  mapM_ (handleController millisecs) leftContrs
+  mapM_ (handleController millisecs) rightContrs
 
-  forM_ rightContrs $ \r -> do 
-    input <- A.liftIO $ NS.getTimeoutInput millisecs r
-    whenJust input (interpretSwitchInput >=> handleSwitchInput)
+
+handleController :: NS.HasInput t => Int -> NS.Controller t -> C.System' ()
+handleController waitTime controller = do 
+  input <- A.liftIO $ NS.getTimeoutInput waitTime controller
+  whenJust input (interpretSwitchInput >=> handleSwitchInput)
 
 
 handleSwitchInput :: C.SwitchInput -> C.System' ()
@@ -80,23 +81,20 @@ connectSwitch :: NS.Console -> IO C.CSwitchControllers
 connectSwitch console = do 
   leftCon  <- mapMM NS.connect (NS.getControllerInfos console)
   rightCon <- mapMM NS.connect (NS.getControllerInfos console)
-  proCon   <- mapMM NS.connect (NS.getControllerInfos console)
 
   mapM_ (NS.setInputMode NS.Simple) leftCon
   mapM_ (NS.setInputMode NS.Simple) rightCon
 
   return C.CSwitchControllers
     { C.leftJoyCon    = leftCon
-    , C.rightJoyCon   = rightCon
-    , C.proController = proCon }
+    , C.rightJoyCon   = rightCon }
 
 
 disconnectSwitch :: C.System' ()
 disconnectSwitch = do 
-  C.CSwitchControllers left right pro <- A.get A.global 
+  C.CSwitchControllers left right <- A.get A.global 
   A.liftIO $ mapM_ NS.disconnect left 
   A.liftIO $ mapM_ NS.disconnect right 
-  A.liftIO $ mapM_ NS.disconnect pro
 
 
 -- Copied from Agda.Utils.Monad
