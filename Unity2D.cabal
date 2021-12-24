@@ -57,6 +57,7 @@ library
     , Rasterific
     , apecs
     , apecs-gloss
+    , apecs-stm
     , base >=4.7 && <5
     , containers
     , extra
@@ -86,6 +87,7 @@ executable Unity2D-exe
     , Unity2D
     , apecs
     , apecs-gloss
+    , apecs-stm
     , base >=4.7 && <5
     , containers
     , extra
@@ -116,6 +118,7 @@ test-suite Unity2D-test
     , Unity2D
     , apecs
     , apecs-gloss
+    , apecs-stm
     , base >=4.7 && <5
     , containers
     , extra

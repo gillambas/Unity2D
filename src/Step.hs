@@ -6,6 +6,7 @@ where
 import Control.Monad (void, when)
 
 import qualified Apecs                as A
+import qualified Apecs.STM            as ASTM 
 
 import qualified Components           as C
 import qualified HandleInput.Switch   as Switch
@@ -58,7 +59,7 @@ stepGame dT = do
 
   triggerEvery dT 3.0 0.0 SRem.removePointsChange
 
-  Switch.handleSwitch dT
+  ASTM.forkSys (Switch.handleSwitch dT)
  
   triggerEvery dT 2.0 0.0 SMove.moveEnemy
   triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
