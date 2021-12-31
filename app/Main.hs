@@ -2,6 +2,7 @@ module Main where
 
 import qualified Apecs                  as A
 import qualified Apecs.Gloss            as AG
+import qualified Apecs.STM              as ASTM
 import qualified Device.Nintendo.Switch as NS
 
 import qualified Components             as C
@@ -17,14 +18,16 @@ main :: IO ()
 main =
   NS.withConsole $ \switch -> do 
     graphics <- Load.loadGraphics
-    switchControllers <- Switch.connectSwitch switch
-
+    switchControllers <- Switch.connectSwitch switch 
+    
     w <- C.initWorld
 
     A.runWith w $ do
       A.set A.global graphics
-      A.set A.global switchControllers
 
+      Switch.setSwitchComponent switchControllers
+      ASTM.forkSys $ Switch.readSwitchInput (fst switchControllers)
+      
       SInit.startNewGame
 
       AG.play
@@ -35,4 +38,4 @@ main =
         Keyboard.eventHandler
         Step.stepper
 
-      Switch.disconnectSwitch
+      --Switch.disconnectSwitch

@@ -2,7 +2,6 @@
 -- By convention, data types which are instantiated as components begin with C
 -- (e.g. CPosition, CPlayer etc.).
 
-{-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DerivingVia                #-}
 {-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -35,7 +34,7 @@ module Components (
   CPosition(..),
   CScreen(..),
   CSkipMove(..),
-  CSwitchControllers(..),
+  CSwitchInput(..),
   CTime(..),
   -- * Other Data Types
   Enemy(..),
@@ -62,14 +61,16 @@ module Components (
 )
 where 
 
+
 import Apecs
 
-import qualified Apecs.Gloss            as AG
-import qualified Data.Map               as Map
-import qualified Device.Nintendo.Switch as NS
-import qualified Graphics.Text.TrueType as TT
-import qualified Linear                 as L
-import qualified System.Random          as R
+import qualified Apecs.Gloss                    as AG
+import qualified Control.Concurrent.STM.TBQueue as TBQ
+import qualified Data.Map                       as Map
+import qualified Device.Nintendo.Switch         as NS
+import qualified Graphics.Text.TrueType         as TT
+import qualified Linear                         as L
+import qualified System.Random                  as R
 
 
 ----------------------------------------------------------------------------------------------
@@ -329,14 +330,11 @@ instance Semigroup CSkipMove where (<>) (CSkipMove s1) (CSkipMove s2) = CSkipMov
 instance Monoid CSkipMove where mempty = CSkipMove True
 instance Component CSkipMove where type Storage CSkipMove = Global CSkipMove 
 
--- CSwitchControllers
-data CSwitchControllers = CSwitchControllers
-  { leftJoyCon    :: [NS.Controller 'NS.LeftJoyCon  ]
-  , rightJoyCon   :: [NS.Controller 'NS.RightJoyCon ]
-  }
-instance Semigroup CSwitchControllers where (<>) _ c2 = c2
-instance Monoid CSwitchControllers where mempty = CSwitchControllers [] []
-instance Component CSwitchControllers where type Storage CSwitchControllers = Global CSwitchControllers
+-- CSwitchInput
+newtype CSwitchInput = CSwitchInput (Maybe (TBQ.TBQueue NS.Input))
+instance Semigroup CSwitchInput where (<>) _ si = si
+instance Monoid CSwitchInput where mempty = CSwitchInput Nothing
+instance Component CSwitchInput where type Storage CSwitchInput = Global CSwitchInput
 
 -- CTime
 newtype CTime = CTime Float deriving (Show, Num)
@@ -370,7 +368,7 @@ makeWorld "World"
   , ''CPosition
   , ''CScreen
   , ''CSkipMove
-  , ''CSwitchControllers
+  , ''CSwitchInput
   , ''CTime
   , ''AG.Camera ]
 

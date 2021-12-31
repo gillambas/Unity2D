@@ -1,24 +1,37 @@
+-- | Functions needed for controlling the game with the Nintendo Switch controllers.
+
 module HandleInput.Switch (
+  -- * Connect
   connectSwitch,
-  disconnectSwitch,
-  handleSwitch
+  setSwitchComponent,
+  -- * Read Switch input
+  readSwitchInput,
+  -- * Handle Switch input
+  handleSwitchInput,
+  -- * Disconnect
+  --disconnectSwitch
 )
 where 
 
 import Control.Monad       ((>=>))
 import Control.Monad.Extra (whenJust)
+import Data.Maybe          (catMaybes)
 import System.Exit         (exitSuccess)
+import System.IO.Unsafe    (unsafePerformIO)
 
-import qualified Apecs                  as A
-import qualified Apecs.Gloss            as AG
-import qualified Device.Nintendo.Switch as NS
+import qualified Apecs                          as A
+import qualified Apecs.Gloss                    as AG
+import qualified Control.Concurrent.STM.TBQueue as TBQ
+import qualified Control.Exception              as E
+import qualified Control.Monad.STM              as STM
+import qualified Device.Nintendo.Switch         as NS
 
-import qualified Components             as C
-import qualified Systems.Attack         as SAttack 
-import qualified Systems.Initialise     as SInit
-import qualified Systems.Move           as SMove
+import qualified Components                     as C
+import qualified Systems.Attack                 as SAttack 
+import qualified Systems.Initialise             as SInit
+import qualified Systems.Move                   as SMove
 
-
+{-
 handleSwitch :: Float -> C.System' ()
 handleSwitch dT = do 
   let millisecs = floor $ dT * 1000.0
@@ -32,21 +45,88 @@ handleSwitch dT = do
 handleController :: NS.HasInput t => Int -> NS.Controller t -> C.System' ()
 handleController waitTime controller = do 
   input <- A.liftIO $ NS.getTimeoutInput waitTime controller
-  whenJust input (interpretSwitchInput >=> handleSwitchInput)
+  whenJust input (interpretSwitchInput >=> switchChangeWorld)
+-}
 
 
-handleSwitchInput :: C.SwitchInput -> C.System' ()
-handleSwitchInput = \case 
-  C.Up      -> SMove.movePlayer AG.KeyUp
-  C.Down    -> SMove.movePlayer AG.KeyDown
-  C.Left    -> SMove.movePlayer AG.KeyLeft
-  C.Right   -> SMove.movePlayer AG.KeyRight
-  C.Attack  -> SAttack.playerAttack
-  C.Restart -> SInit.startNewGame
-  C.Exit    -> A.liftIO exitSuccess
-  C.None    -> return ()
+----------------------------------------------------------------------------------------------
+-----------------------                     CONNECT                    -----------------------
+----------------------------------------------------------------------------------------------
+-- | Set the global CSwitchInput component.
+-- If controller connected create the TBQueue which will store the inputs.
+-- If controller not connected set component to Nothing.
+setSwitchComponent :: (Maybe (NS.Controller NS.LeftJoyCon), Maybe (NS.Controller NS.RightJoyCon)) -> C.System' ()
+setSwitchComponent (leftCon, _) = do 
+  let switchInput = case leftCon of 
+                      Nothing -> C.CSwitchInput Nothing
+                      _       -> C.CSwitchInput (Just (unsafePerformIO $ TBQ.newTBQueueIO 10))
+
+  A.set A.global switchInput
 
 
+-- | Connect at most one left and one right joy con.
+connectSwitch :: NS.Console -> IO (Maybe (NS.Controller NS.LeftJoyCon), Maybe (NS.Controller NS.RightJoyCon))
+connectSwitch console = do 
+  leftCon  <- oneOrNone <$> mapMM safeConnect (NS.getControllerInfos @'NS.LeftJoyCon console)
+  rightCon <- oneOrNone <$> mapMM safeConnect (NS.getControllerInfos @'NS.RightJoyCon console)
+
+  whenJust leftCon  (NS.setInputMode NS.Simple)
+  whenJust rightCon (NS.setInputMode NS.Simple)
+
+  return (leftCon, rightCon)
+
+
+-- | Safe version of Device.Nintendo.Switch.connect.
+-- Returns Nothing if no controller is detected.
+safeConnect :: forall t. NS.HasCalibration t => NS.ControllerInfo t -> IO (Maybe (NS.Controller t))
+safeConnect controllerInfo = do
+  connection :: Either NS.ConnectionException (NS.Controller t) <- E.try $ NS.connect controllerInfo
+
+  case connection of 
+    Right c -> return (Just c)
+    _       -> return Nothing
+
+
+-- | If multiple controllers are connected keep only the first one (as this is a single-player game).
+-- If no controllers are connected returns Nothing.
+oneOrNone :: forall t. NS.HasCalibration t => [Maybe (NS.Controller t)] -> Maybe (NS.Controller t)
+oneOrNone controllers = controller
+  where 
+    controllers' = catMaybes controllers
+    controller   = case controllers' of 
+      [] -> Nothing
+      _  -> Just (head controllers')
+----------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------
+-----------------------               READ SWITCH INPUT                -----------------------
+----------------------------------------------------------------------------------------------
+-- | Read input sent from Switch controller and store in TBQueue
+-- (if controller connected).
+readSwitchInput :: NS.HasInput t => Maybe (NS.Controller t) -> C.System' ()
+readSwitchInput Nothing = return ()
+readSwitchInput (Just controller) = do 
+  C.CSwitchInput inputQueue <- A.get A.global
+  whenJust inputQueue (\iq -> do 
+    input <- A.liftIO $ NS.getInput controller 
+    liftAtomically (TBQ.writeTBQueue iq input) )
+----------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------
+-----------------------              HANDLE SWITCH INPUT               -----------------------
+----------------------------------------------------------------------------------------------
+-- | Read topmost input stored in TBQueue, interpret it according to game rules
+-- and change the game world accordingly.
+handleSwitchInput :: TBQ.TBQueue NS.Input -> C.System' ()
+handleSwitchInput inputQueue = do 
+  input <- liftAtomically (TBQ.readTBQueue inputQueue)
+  interpretedInput <- interpretSwitchInput input
+  changeWorld interpretedInput
+
+
+-- | Interpret input from Switch controller according to game rules.
 interpretSwitchInput :: NS.Input -> C.System' C.SwitchInput 
 interpretSwitchInput input = do 
   C.CScreen screen <- A.get A.global
@@ -66,6 +146,8 @@ interpretSwitchInput input = do
   return switchInput
 
 
+-- | Auxiliary to interpretSwitchInput.
+-- Only discrete stick directions are recognised.
 interpretStickDirection :: NS.StickDirection a -> C.SwitchInput
 interpretStickDirection (NS.Analog _ _) = C.None
 interpretStickDirection (NS.Discrete d) = case d of
@@ -77,27 +159,44 @@ interpretStickDirection (NS.Discrete d) = case d of
   _        -> C.None
 
 
-connectSwitch :: NS.Console -> IO C.CSwitchControllers
-connectSwitch console = do 
-  leftCon  <- mapMM NS.connect (NS.getControllerInfos console)
-  rightCon <- mapMM NS.connect (NS.getControllerInfos console)
+-- | Change the game world based on the input of the Switch controller.
+changeWorld :: C.SwitchInput -> C.System' ()
+changeWorld = \case 
+  C.Up      -> SMove.movePlayer AG.KeyUp
+  C.Down    -> SMove.movePlayer AG.KeyDown
+  C.Left    -> SMove.movePlayer AG.KeyLeft
+  C.Right   -> SMove.movePlayer AG.KeyRight
+  C.Attack  -> SAttack.playerAttack
+  C.Restart -> SInit.startNewGame
+  C.Exit    -> A.liftIO exitSuccess
+  C.None    -> return ()
+----------------------------------------------------------------------------------------------
 
-  mapM_ (NS.setInputMode NS.Simple) leftCon
-  mapM_ (NS.setInputMode NS.Simple) rightCon
 
-  return C.CSwitchControllers
-    { C.leftJoyCon    = leftCon
-    , C.rightJoyCon   = rightCon }
-
-
+----------------------------------------------------------------------------------------------
+-----------------------                   DISCONNECT                   -----------------------
+----------------------------------------------------------------------------------------------
+{-
 disconnectSwitch :: C.System' ()
 disconnectSwitch = do 
   C.CSwitchControllers left right <- A.get A.global 
   A.liftIO $ mapM_ NS.disconnect left 
   A.liftIO $ mapM_ NS.disconnect right 
+-}
+----------------------------------------------------------------------------------------------
 
 
+----------------------------------------------------------------------------------------------
+-----------------------              AUXILIARY FUNCTIONS               -----------------------
+----------------------------------------------------------------------------------------------
 -- Copied from Agda.Utils.Monad
 -- (https://hackage.haskell.org/package/Agda-2.6.2/docs/Agda-Utils-Monad.html#v:mapMM)
 mapMM :: (Traversable t, Monad m) => (a -> m b) -> m (t a) -> m (t b)
 mapMM f mxs = mapM f =<< mxs
+
+
+-- | Convenience function.
+-- Execute an STM transaction atomically and lift the results in the System' monad.
+liftAtomically :: STM.STM a -> C.System' a 
+liftAtomically = A.liftIO . STM.atomically
+----------------------------------------------------------------------------------------------

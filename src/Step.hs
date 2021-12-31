@@ -3,17 +3,21 @@ module Step (
 )
 where
 
-import Control.Monad (void, when)
+import Control.Monad       (void, when)
+import Control.Monad.Extra (whenJust)
 
-import qualified Apecs                as A
+import qualified Apecs                          as A
+import qualified Apecs.STM                      as ASTM
+import qualified Control.Monad.STM              as STM
+import qualified Control.Concurrent.STM.TBQueue as TBQ
 
-import qualified Components           as C
-import qualified HandleInput.Switch   as Switch
-import qualified Systems.Attack       as SAttack
-import qualified Systems.Check        as SCheck
-import qualified Systems.Move         as SMove
-import qualified Systems.Remove       as SRem
-import qualified Visualise.Animations as Anim
+import qualified Components                     as C
+import qualified HandleInput.Switch             as Switch
+import qualified Systems.Attack                 as SAttack
+import qualified Systems.Check                  as SCheck
+import qualified Systems.Move                   as SMove
+import qualified Systems.Remove                 as SRem
+import qualified Visualise.Animations           as Anim
 
 
 -- | Main stepping function combining all steppers.
@@ -58,8 +62,9 @@ stepGame dT = do
 
   triggerEvery dT 3.0 0.0 SRem.removePointsChange
 
-  Switch.handleSwitch dT
- 
+  C.CSwitchInput inputQueue <- A.get A.global
+  ASTM.forkSys $ whenJust inputQueue Switch.handleSwitchInput -- TODO: On a new thread?
+
   triggerEvery dT 2.0 0.0 SMove.moveEnemy
   triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
 

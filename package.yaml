@@ -20,6 +20,7 @@ category: Game
 description:         Please see the README on GitHub at <https://github.com/montetzouma/Unity2D#readme>
 
 default-extensions:
+  - DataKinds
   - LambdaCase
   - NamedFieldPuns
   - ScopedTypeVariables
@@ -29,6 +30,7 @@ dependencies:
   - base >= 4.7 && < 5
   - apecs
   - apecs-gloss
+  - apecs-stm
   - containers
   - extra
   - FontyFruity
@@ -38,6 +40,7 @@ dependencies:
   - linear
   - random
   - Rasterific
+  - stm
   - switch
 
 library:

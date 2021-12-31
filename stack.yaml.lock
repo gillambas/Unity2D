@@ -12,6 +12,13 @@ packages:
   original:
     hackage: apecs-physics-0.4.4
 - completed:
+    hackage: apecs-stm-0.1.5@sha256:856a51e58f2fe4a35d15b765df517adc934919599ccf2e4ea2c25d7aa567220c,1086
+    pantry-tree:
+      size: 374
+      sha256: 35367461d0fd99235ccd9993db08b9edde4f117ed951114bf50cbe3242957976
+  original:
+    hackage: apecs-stm-0.1.5@sha256:856a51e58f2fe4a35d15b765df517adc934919599ccf2e4ea2c25d7aa567220c,1086
+- completed:
     hackage: Cabal-3.2.1.0@sha256:8743076ec022296f9771d962000c9ca3a0fe02e68c37b992c63e382a675f791d,27482
     pantry-tree:
       size: 41224
@@ -46,6 +53,20 @@ packages:
       sha256: 1591d9d1034f19cd38fbda525969f805b5ca083b45da85602cf2b04c1a82f640
   original:
     hackage: time-1.10@sha256:536801b30aa2ce66da07cb19847827662650907efb2af4c8bef0a6276445075f,5738
+- completed:
+    hackage: stm-containers-1.2@sha256:a887f2e7692b7cf20e0b081e2d66e21076e2bd4b57016ec59c484edfa2d29397,3244
+    pantry-tree:
+      size: 761
+      sha256: 20b1076bdb121347ccc512a67df697eed34815a8e35279b6b9a0951963b1eba2
+  original:
+    hackage: stm-containers-1.2@sha256:a887f2e7692b7cf20e0b081e2d66e21076e2bd4b57016ec59c484edfa2d29397,3244
+- completed:
+    hackage: stm-hamt-1.2.0.6@sha256:fba86ccb4b45c5706c19b0e1315ba63dcac3b5d71de945ec001ba921fae80061,3972
+    pantry-tree:
+      size: 1009
+      sha256: 1920790535af832b76e7583c33ecf51f8b0b0c3615ef1db1c8ed9be19622c1db
+  original:
+    hackage: stm-hamt-1.2.0.6@sha256:fba86ccb4b45c5706c19b0e1315ba63dcac3b5d71de945ec001ba921fae80061,3972
 - completed:
     hackage: switch-0.1.0.0@sha256:e70d71b13c3b7640f48f21933f1cf0e8fde3c013b015b1db69386fcf7cc3cb25,3007
     pantry-tree:
