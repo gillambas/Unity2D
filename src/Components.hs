@@ -335,6 +335,10 @@ newtype CSwitchInput = CSwitchInput (Maybe (TBQ.TBQueue NS.Input))
 instance Semigroup CSwitchInput where (<>) _ si = si
 instance Monoid CSwitchInput where mempty = CSwitchInput Nothing
 instance Component CSwitchInput where type Storage CSwitchInput = Global CSwitchInput
+instance Show CSwitchInput where 
+  show (CSwitchInput Nothing) = "Component not set"
+  show _                      = "Component set"
+
 
 -- CTime
 newtype CTime = CTime Float deriving (Show, Num)

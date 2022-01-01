@@ -63,12 +63,20 @@ setSwitchComponent (leftCon, _) = do
 
   A.set A.global switchInput
 
+  -- VERBOSE
+  si :: C.CSwitchInput <- A.get A.global
+  A.liftIO (print si)
+
 
 -- | Connect at most one left and one right joy con.
 connectSwitch :: NS.Console -> IO (Maybe (NS.Controller NS.LeftJoyCon), Maybe (NS.Controller NS.RightJoyCon))
 connectSwitch console = do 
   leftCon  <- oneOrNone <$> mapMM safeConnect (NS.getControllerInfos @'NS.LeftJoyCon console)
   rightCon <- oneOrNone <$> mapMM safeConnect (NS.getControllerInfos @'NS.RightJoyCon console)
+
+  -- VERBOSE
+  whenJust leftCon  (\_ -> putStrLn "Left connected")
+  whenJust rightCon (\_ -> putStrLn "Right connected")
 
   whenJust leftCon  (NS.setInputMode NS.Simple)
   whenJust rightCon (NS.setInputMode NS.Simple)
