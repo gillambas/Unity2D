@@ -331,14 +331,23 @@ instance Monoid CSkipMove where mempty = CSkipMove True
 instance Component CSkipMove where type Storage CSkipMove = Global CSkipMove 
 
 -- CSwitchInput
-newtype CSwitchInput = CSwitchInput (Maybe (TBQ.TBQueue NS.Input))
-instance Semigroup CSwitchInput where (<>) _ si = si
-instance Monoid CSwitchInput where mempty = CSwitchInput Nothing
-instance Component CSwitchInput where type Storage CSwitchInput = Global CSwitchInput
-instance Show CSwitchInput where 
-  show (CSwitchInput Nothing) = "Component not set"
-  show _                      = "Component set"
+data CSwitchInput = CSwitchInput
+  { leftCon  :: Maybe (TBQ.TBQueue NS.Input)
+  , rightCon :: Maybe (TBQ.TBQueue NS.Input)
+  , proCon   :: Maybe (TBQ.TBQueue NS.Input) 
+  }
 
+instance Semigroup CSwitchInput where (<>) _ si = si
+instance Monoid CSwitchInput where mempty = CSwitchInput Nothing Nothing Nothing
+instance Component CSwitchInput where type Storage CSwitchInput = Global CSwitchInput
+
+instance Show CSwitchInput where 
+  show (CSwitchInput left right pro) = leftMsg <> rightMsg <> proMsg
+  where 
+    leftMsg    = maybe ("Left "  <> defaultMsg) (\_ -> "Left component set " ) left
+    rightMsg   = maybe ("Right " <> defaultMsg) (\_ -> "Right component set ") right
+    proMsg     = maybe ("Pro "   <> defaultMsg) (\_ -> "Pro component set"   ) pro
+    defaultMsg = "component not set "
 
 -- CTime
 newtype CTime = CTime Float deriving (Show, Num)

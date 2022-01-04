@@ -56,6 +56,7 @@ handleController waitTime controller = do
 -- If controller connected create the TBQueue which will store the inputs.
 -- If controller not connected set component to Nothing.
 setSwitchComponent :: (Maybe (NS.Controller NS.LeftJoyCon), Maybe (NS.Controller NS.RightJoyCon)) -> C.System' ()
+-- TODO: Handle all records correctly.
 setSwitchComponent (leftCon, _) = do 
   let switchInput = case leftCon of 
                       Nothing -> C.CSwitchInput Nothing
@@ -115,10 +116,11 @@ oneOrNone controllers = controller
 readSwitchInput :: NS.HasInput t => Maybe (NS.Controller t) -> C.System' ()
 readSwitchInput Nothing = return ()
 readSwitchInput (Just controller) = do 
-  C.CSwitchInput inputQueue <- A.get A.global
-  whenJust inputQueue (\iq -> do 
+  C.CSwitchInput leftQ rightQ proQ <- A.get A.global
+  -- TODO: Handle other queues.
+  whenJust leftQ (\q -> do
     input <- A.liftIO $ NS.getInput controller 
-    liftAtomically (TBQ.writeTBQueue iq input) )
+    liftAtomically (TBQ.writeTBQueue q input) )
 ----------------------------------------------------------------------------------------------
 
 

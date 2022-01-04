@@ -62,8 +62,10 @@ stepGame dT = do
 
   triggerEvery dT 3.0 0.0 SRem.removePointsChange
 
-  C.CSwitchInput inputQueue <- A.get A.global
-  ASTM.forkSys $ whenJust inputQueue Switch.handleSwitchInput -- TODO: On a new thread?
+  C.CSwitchInput leftQ rightQ proQ <- A.get A.global
+  -- TODO: On a new thread? Or take ID of reading thread and fork on it?
+  -- TODO: Handle rightQ, proQ
+  ASTM.forkSys $ whenJust leftQ Switch.handleSwitchInput
 
   triggerEvery dT 2.0 0.0 SMove.moveEnemy
   triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
