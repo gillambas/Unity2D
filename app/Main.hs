@@ -40,4 +40,4 @@ main =
         Keyboard.eventHandler
         Step.stepper
 
-      --Switch.disconnectSwitch
+    Switch.disconnectSwitch controllers

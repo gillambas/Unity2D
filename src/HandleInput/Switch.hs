@@ -11,7 +11,7 @@ module HandleInput.Switch (
   -- * Handle Switch input
   handleSwitchInput,
   -- * Disconnect
-  --disconnectSwitch
+  disconnectSwitch
 )
 where 
 
@@ -209,13 +209,15 @@ changeWorld = \case
 ----------------------------------------------------------------------------------------------
 -----------------------                   DISCONNECT                   -----------------------
 ----------------------------------------------------------------------------------------------
-{-
-disconnectSwitch :: C.System' ()
-disconnectSwitch = do 
-  C.CSwitchControllers left right <- A.get A.global 
-  A.liftIO $ mapM_ NS.disconnect left 
-  A.liftIO $ mapM_ NS.disconnect right 
--}
+disconnectSwitch
+  :: ( Maybe (NS.Controller NS.LeftJoyCon)
+     , Maybe (NS.Controller NS.RightJoyCon)
+     , Maybe (NS.Controller NS.ProController) )
+  -> IO ()
+disconnectSwitch (leftCon, rightCon, proCon) = do 
+  whenJust leftCon  NS.disconnect
+  whenJust rightCon NS.disconnect
+  whenJust proCon   NS.disconnect
 ----------------------------------------------------------------------------------------------
 
 
