@@ -18,15 +18,17 @@ main :: IO ()
 main =
   NS.withConsole $ \switch -> do 
     graphics <- Load.loadGraphics
-    switchControllers <- Switch.connectSwitch switch 
+    controllers@(leftCon, rightCon, proCon) <- Switch.connectSwitch switch 
     
     w <- C.initWorld
 
     A.runWith w $ do
       A.set A.global graphics
 
-      Switch.setSwitchComponent switchControllers
-      ASTM.forkSys $ Switch.readSwitchInput (fst switchControllers)
+      Switch.setSwitchComponent controllers
+
+      -- TODO: New threads for other records of component?
+      ASTM.forkSys $ Switch.readSwitchInput rightCon
       
       SInit.startNewGame
 

@@ -1,5 +1,7 @@
 -- | Functions needed for controlling the game with the Nintendo Switch controllers.
 
+{-# LANGUAGE KindSignatures #-}
+
 module HandleInput.Switch (
   -- * Connect
   connectSwitch,
@@ -53,36 +55,57 @@ handleController waitTime controller = do
 -----------------------                     CONNECT                    -----------------------
 ----------------------------------------------------------------------------------------------
 -- | Set the global CSwitchInput component.
--- If controller connected create the TBQueue which will store the inputs.
--- If controller not connected set component to Nothing.
-setSwitchComponent :: (Maybe (NS.Controller NS.LeftJoyCon), Maybe (NS.Controller NS.RightJoyCon)) -> C.System' ()
--- TODO: Handle all records correctly.
-setSwitchComponent (leftCon, _) = do 
-  let switchInput = case leftCon of 
-                      Nothing -> C.CSwitchInput Nothing
-                      _       -> C.CSwitchInput (Just (unsafePerformIO $ TBQ.newTBQueueIO 10))
-
-  A.set A.global switchInput
+-- If controller(s) connected create the TBQueue(s) which will store the inputs.
+-- If controller(s) not connected set component field(s) to Nothing.
+setSwitchComponent 
+  :: ( Maybe (NS.Controller NS.LeftJoyCon)
+     , Maybe (NS.Controller NS.RightJoyCon)
+     , Maybe (NS.Controller NS.ProController) )
+  -> C.System' ()
+setSwitchComponent (leftCon, rightCon, proCon) = do 
+  let leftComp  = setComponent leftCon
+      rightComp = setComponent rightCon
+      proComp   = setComponent proCon
+      component = C.CSwitchInput leftComp rightComp proComp
+ 
+  A.set A.global component
 
   -- VERBOSE
   si :: C.CSwitchInput <- A.get A.global
   A.liftIO (print si)
 
 
--- | Connect at most one left and one right joy con.
-connectSwitch :: NS.Console -> IO (Maybe (NS.Controller NS.LeftJoyCon), Maybe (NS.Controller NS.RightJoyCon))
-connectSwitch console = do 
-  leftCon  <- oneOrNone <$> mapMM safeConnect (NS.getControllerInfos @'NS.LeftJoyCon console)
-  rightCon <- oneOrNone <$> mapMM safeConnect (NS.getControllerInfos @'NS.RightJoyCon console)
+-- | Set field (left/right/pro) of global CSwitchInput component.
+-- Auxiliary to setSwitchComponent.
+setComponent :: Maybe (NS.Controller t) -> Maybe (TBQ.TBQueue NS.Input)
+setComponent = maybe Nothing (const (Just (unsafePerformIO $ TBQ.newTBQueueIO 10))) 
 
-  -- VERBOSE
-  whenJust leftCon  (\_ -> putStrLn "Left connected")
-  whenJust rightCon (\_ -> putStrLn "Right connected")
+
+-- | Connect at most one of each: left joy, right joy con and pro controller.
+connectSwitch 
+  :: NS.Console 
+  -> IO ( Maybe (NS.Controller NS.LeftJoyCon)
+        , Maybe (NS.Controller NS.RightJoyCon)
+        , Maybe (NS.Controller NS.ProController) )
+connectSwitch console = do 
+  leftCon  <- connectController console 
+  rightCon <- connectController console
+  proCon   <- connectController console
 
   whenJust leftCon  (NS.setInputMode NS.Simple)
   whenJust rightCon (NS.setInputMode NS.Simple)
 
-  return (leftCon, rightCon)
+  -- VERBOSE
+  maybe (putStrLn "Left Switch joy con not connected")  (\_ -> putStrLn "Left Switch joy con connected") leftCon
+  maybe (putStrLn "Right Switch joy con not connected") (\_ -> putStrLn "Right Switch joy con connected") rightCon
+
+  return (leftCon, rightCon, proCon)
+
+
+-- | Connect one controller (left/right/pro).
+-- Auxiliary to connectSwitch.
+connectController :: forall t. (NS.HasCalibration t, NS.IsController t) => NS.Console -> IO (Maybe (NS.Controller t))
+connectController console = oneOrNone <$> mapMM safeConnect (NS.getControllerInfos console)
 
 
 -- | Safe version of Device.Nintendo.Switch.connect.

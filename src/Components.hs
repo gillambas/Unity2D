@@ -343,11 +343,11 @@ instance Component CSwitchInput where type Storage CSwitchInput = Global CSwitch
 
 instance Show CSwitchInput where 
   show (CSwitchInput left right pro) = leftMsg <> rightMsg <> proMsg
-  where 
-    leftMsg    = maybe ("Left "  <> defaultMsg) (\_ -> "Left component set " ) left
-    rightMsg   = maybe ("Right " <> defaultMsg) (\_ -> "Right component set ") right
-    proMsg     = maybe ("Pro "   <> defaultMsg) (\_ -> "Pro component set"   ) pro
-    defaultMsg = "component not set "
+    where 
+      leftMsg    = "Left Switch component"  <> msg left  <> "set - "
+      rightMsg   = "Right Switch component" <> msg right <> "set - "
+      proMsg     = "Pro Switch component"   <> msg pro   <> "set."
+      msg        = maybe " not " (const " ")
 
 -- CTime
 newtype CTime = CTime Float deriving (Show, Num)
