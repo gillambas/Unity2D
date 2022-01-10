@@ -7,7 +7,9 @@ module HandleInput.Switch (
   connectSwitch,
   setSwitchComponent,
   -- * Read Switch input
-  readSwitchInput,
+  readLeftInput,
+  readProInput,
+  readRightInput,
   -- * Handle Switch input
   handleSwitchInput,
   -- * Disconnect
@@ -15,7 +17,7 @@ module HandleInput.Switch (
 )
 where 
 
-import Control.Monad       ((>=>))
+import Control.Monad       (forever)
 import Control.Monad.Extra (whenJust)
 import Data.Maybe          (catMaybes)
 import System.Exit         (exitSuccess)
@@ -32,6 +34,9 @@ import qualified Components                     as C
 import qualified Systems.Attack                 as SAttack 
 import qualified Systems.Initialise             as SInit
 import qualified Systems.Move                   as SMove
+
+
+import qualified Apecs.STM as ASTM
 
 {-
 handleSwitch :: Float -> C.System' ()
@@ -96,8 +101,9 @@ connectSwitch console = do
   whenJust rightCon (NS.setInputMode NS.Simple)
 
   -- VERBOSE
-  maybe (putStrLn "Left Switch joy con not connected")  (\_ -> putStrLn "Left Switch joy con connected") leftCon
-  maybe (putStrLn "Right Switch joy con not connected") (\_ -> putStrLn "Right Switch joy con connected") rightCon
+  maybe (putStrLn "Left joy con not connected")   (\_ -> putStrLn "Left joy con connected")   leftCon
+  maybe (putStrLn "Right joy con not connected")  (\_ -> putStrLn "Right joy con connected")  rightCon
+  maybe (putStrLn "Pro controller not connected") (\_ -> putStrLn "Pro controller connected") rightCon
 
   return (leftCon, rightCon, proCon)
 
@@ -134,16 +140,39 @@ oneOrNone controllers = controller
 ----------------------------------------------------------------------------------------------
 -----------------------               READ SWITCH INPUT                -----------------------
 ----------------------------------------------------------------------------------------------
--- | Read input sent from Switch controller and store in TBQueue
--- (if controller connected).
-readSwitchInput :: NS.HasInput t => Maybe (NS.Controller t) -> C.System' ()
-readSwitchInput Nothing = return ()
-readSwitchInput (Just controller) = do 
-  C.CSwitchInput leftQ rightQ proQ <- A.get A.global
-  -- TODO: Handle other queues.
-  whenJust leftQ (\q -> do
-    input <- A.liftIO $ NS.getInput controller 
-    liftAtomically (TBQ.writeTBQueue q input) )
+-- | Read input sent from Left joy con and store in respective TBQueue (if controller connected).
+readLeftInput :: Maybe (NS.Controller NS.LeftJoyCon) -> C.System' ()
+readLeftInput Nothing = return ()
+readLeftInput (Just controller) = do 
+  C.CSwitchInput queue _ _ <- A.get A.global
+  readControllerInput controller queue
+
+
+-- | Read input sent from Right joy con and store in respective TBQueue (if controller connected).
+readRightInput :: Maybe (NS.Controller NS.RightJoyCon) -> C.System' ()
+readRightInput Nothing = return ()
+readRightInput (Just controller) = do 
+  C.CSwitchInput _ queue _ <- A.get A.global
+  readControllerInput controller queue
+
+
+-- | Read input sent from Pro controller and store in respective TBQueue (if controller connected).
+readProInput :: Maybe (NS.Controller NS.ProController) -> C.System' ()
+readProInput Nothing = return ()
+readProInput (Just controller) = do 
+  C.CSwitchInput _ _ queue <- A.get A.global
+  readControllerInput controller queue
+
+
+-- | Read input and write TBQueue for arbitrary controller.
+-- Auxiliary to readLeftInput, readRightInput & readProInput.
+readControllerInput :: NS.HasInput t => NS.Controller t -> Maybe (TBQ.TBQueue NS.Input) -> C.System' ()
+readControllerInput _ Nothing = return ()
+readControllerInput controller (Just queue) = forever $ do 
+  ASTM.threadDelay 1000000
+  input <- A.liftIO $ NS.getInput controller 
+  A.liftIO $ print input -- VERBOSE
+  liftAtomically (TBQ.writeTBQueue queue input)
 ----------------------------------------------------------------------------------------------
 
 
@@ -156,6 +185,10 @@ handleSwitchInput :: TBQ.TBQueue NS.Input -> C.System' ()
 handleSwitchInput inputQueue = do 
   input <- liftAtomically (TBQ.readTBQueue inputQueue)
   interpretedInput <- interpretSwitchInput input
+
+  -- VERBOSE
+  A.liftIO $ print interpretedInput
+
   changeWorld interpretedInput
 
 

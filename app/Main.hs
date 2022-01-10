@@ -27,8 +27,9 @@ main =
 
       Switch.setSwitchComponent controllers
 
-      -- TODO: New threads for other records of component?
-      ASTM.forkSys $ Switch.readSwitchInput rightCon
+      ASTM.forkSys $ Switch.readLeftInput  leftCon
+      ASTM.forkSys $ Switch.readRightInput rightCon
+      ASTM.forkSys $ Switch.readProInput   proCon
       
       SInit.startNewGame
 
