@@ -18,14 +18,14 @@ main :: IO ()
 main =
   NS.withConsole $ \switch -> do 
     graphics <- Load.loadGraphics
-    controllers@(leftCon, rightCon, proCon) <- Switch.connectSwitch switch 
+    controllers@(leftCon, rightCon, proCon) <- Switch.connectControllers switch 
     
     w <- C.initWorld
 
     A.runWith w $ do
       A.set A.global graphics
 
-      Switch.setSwitchComponent controllers
+      Switch.setCSwitchInput controllers
 
       ASTM.forkSys $ Switch.readLeftInput  leftCon
       ASTM.forkSys $ Switch.readRightInput rightCon

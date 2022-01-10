@@ -4,8 +4,9 @@
 
 module HandleInput.Switch (
   -- * Connect
-  connectSwitch,
-  setSwitchComponent,
+  connectControllers,
+  -- * Set component
+  setCSwitchInput,
   -- * Read Switch input
   readLeftInput,
   readProInput,
@@ -59,40 +60,13 @@ handleController waitTime controller = do
 ----------------------------------------------------------------------------------------------
 -----------------------                     CONNECT                    -----------------------
 ----------------------------------------------------------------------------------------------
--- | Set the global CSwitchInput component.
--- If controller(s) connected create the TBQueue(s) which will store the inputs.
--- If controller(s) not connected set component field(s) to Nothing.
-setSwitchComponent 
-  :: ( Maybe (NS.Controller NS.LeftJoyCon)
-     , Maybe (NS.Controller NS.RightJoyCon)
-     , Maybe (NS.Controller NS.ProController) )
-  -> C.System' ()
-setSwitchComponent (leftCon, rightCon, proCon) = do 
-  let leftComp  = setComponent leftCon
-      rightComp = setComponent rightCon
-      proComp   = setComponent proCon
-      component = C.CSwitchInput leftComp rightComp proComp
- 
-  A.set A.global component
-
-  -- VERBOSE
-  si :: C.CSwitchInput <- A.get A.global
-  A.liftIO (print si)
-
-
--- | Set field (left/right/pro) of global CSwitchInput component.
--- Auxiliary to setSwitchComponent.
-setComponent :: Maybe (NS.Controller t) -> Maybe (TBQ.TBQueue NS.Input)
-setComponent = maybe Nothing (const (Just (unsafePerformIO $ TBQ.newTBQueueIO 10))) 
-
-
 -- | Connect at most one of each: left joy, right joy con and pro controller.
-connectSwitch 
+connectControllers 
   :: NS.Console 
   -> IO ( Maybe (NS.Controller NS.LeftJoyCon)
         , Maybe (NS.Controller NS.RightJoyCon)
         , Maybe (NS.Controller NS.ProController) )
-connectSwitch console = do 
+connectControllers console = do 
   leftCon  <- connectController console 
   rightCon <- connectController console
   proCon   <- connectController console
@@ -109,7 +83,7 @@ connectSwitch console = do
 
 
 -- | Connect one controller (left/right/pro).
--- Auxiliary to connectSwitch.
+-- Auxiliary to connectControllers.
 connectController :: forall t. (NS.HasCalibration t, NS.IsController t) => NS.Console -> IO (Maybe (NS.Controller t))
 connectController console = oneOrNone <$> mapMM safeConnect (NS.getControllerInfos console)
 
@@ -134,6 +108,37 @@ oneOrNone controllers = controller
     controller   = case controllers' of 
       [] -> Nothing
       _  -> Just (head controllers')
+----------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------
+-----------------------                  SET COMPONENT                 -----------------------
+----------------------------------------------------------------------------------------------
+-- | Set the global CSwitchInput component.
+-- If controller(s) connected create the TBQueue(s) which will store the inputs.
+-- If controller(s) not connected set component field(s) to Nothing.
+setCSwitchInput 
+  :: ( Maybe (NS.Controller NS.LeftJoyCon)
+     , Maybe (NS.Controller NS.RightJoyCon)
+     , Maybe (NS.Controller NS.ProController) )
+  -> C.System' ()
+setCSwitchInput (leftCon, rightCon, proCon) = do 
+  let leftComp  = setCSwitchInput' leftCon
+      rightComp = setCSwitchInput' rightCon
+      proComp   = setCSwitchInput' proCon
+      component = C.CSwitchInput leftComp rightComp proComp
+ 
+  A.set A.global component
+
+  -- VERBOSE
+  si :: C.CSwitchInput <- A.get A.global
+  A.liftIO (print si)
+
+
+-- | Set field (left/right/pro) of global CSwitchInput component.
+-- Auxiliary to setCSwitchInput.
+setCSwitchInput' :: Maybe (NS.Controller t) -> Maybe (TBQ.TBQueue NS.Input)
+setCSwitchInput' = maybe Nothing (const (Just (unsafePerformIO $ TBQ.newTBQueueIO 10)))
 ----------------------------------------------------------------------------------------------
 
 

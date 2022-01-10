@@ -64,8 +64,9 @@ stepGame dT = do
 
   C.CSwitchInput leftQ rightQ proQ <- A.get A.global
   -- TODO: On a new thread? Or take ID of reading thread and fork on it?
-  -- TODO: Handle rightQ, proQ
+  ASTM.forkSys $ whenJust leftQ  Switch.handleSwitchInput
   ASTM.forkSys $ whenJust rightQ Switch.handleSwitchInput
+  ASTM.forkSys $ whenJust proQ   Switch.handleSwitchInput
 
   triggerEvery dT 2.0 0.0 SMove.moveEnemy
   triggerEvery dT 2.0 0.0 SAttack.enemiesAttack
