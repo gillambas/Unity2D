@@ -48,7 +48,7 @@ incrTime dT = A.modify A.global $ \(C.CTime t) -> C.CTime (t+dT)
 
 
 stepTitleCard :: Float -> C.System' ()
-stepTitleCard _ = return ()
+stepTitleCard _ = return () -- TODO: Add switch controlls here
 
 
 stepGame :: Float -> C.System' ()
@@ -62,11 +62,11 @@ stepGame dT = do
 
   triggerEvery dT 3.0 0.0 SRem.removePointsChange
 
-  C.CSwitchInput leftQ rightQ proQ <- A.get A.global
   -- TODO: On a new thread? Or take ID of reading thread and fork on it?
-  ASTM.forkSys $ whenJust leftQ  Switch.handleSwitchInput
-  ASTM.forkSys $ whenJust rightQ Switch.handleSwitchInput
-  ASTM.forkSys $ whenJust proQ   Switch.handleSwitchInput
+  C.CSwitchInput leftQ rightQ proQ <- A.get A.global
+  whenJust leftQ  Switch.handleSwitchInput
+  whenJust rightQ Switch.handleSwitchInput
+  whenJust proQ   Switch.handleSwitchInput
 
   triggerEvery dT 2.0 0.0 SMove.moveEnemy
   triggerEvery dT 2.0 0.0 SAttack.enemiesAttack

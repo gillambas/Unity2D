@@ -77,7 +77,7 @@ connectControllers console = do
   -- VERBOSE
   maybe (putStrLn "Left joy con not connected")   (\_ -> putStrLn "Left joy con connected")   leftCon
   maybe (putStrLn "Right joy con not connected")  (\_ -> putStrLn "Right joy con connected")  rightCon
-  maybe (putStrLn "Pro controller not connected") (\_ -> putStrLn "Pro controller connected") rightCon
+  maybe (putStrLn "Pro controller not connected") (\_ -> putStrLn "Pro controller connected") proCon
 
   return (leftCon, rightCon, proCon)
 
@@ -138,7 +138,7 @@ setCSwitchInput (leftCon, rightCon, proCon) = do
 -- | Set field (left/right/pro) of global CSwitchInput component.
 -- Auxiliary to setCSwitchInput.
 setCSwitchInput' :: Maybe (NS.Controller t) -> Maybe (TBQ.TBQueue NS.Input)
-setCSwitchInput' = maybe Nothing (const (Just (unsafePerformIO $ TBQ.newTBQueueIO 10)))
+setCSwitchInput' = maybe Nothing (const (Just (unsafePerformIO $ TBQ.newTBQueueIO 10))) --TODO: How long should the Q be?
 ----------------------------------------------------------------------------------------------
 
 
@@ -190,10 +190,7 @@ handleSwitchInput :: TBQ.TBQueue NS.Input -> C.System' ()
 handleSwitchInput inputQueue = do 
   input <- liftAtomically (TBQ.readTBQueue inputQueue)
   interpretedInput <- interpretSwitchInput input
-
-  -- VERBOSE
-  A.liftIO $ print interpretedInput
-
+  A.liftIO $ print interpretedInput -- VERBOSE
   changeWorld interpretedInput
 
 
@@ -201,7 +198,7 @@ handleSwitchInput inputQueue = do
 interpretSwitchInput :: NS.Input -> C.System' C.SwitchInput 
 interpretSwitchInput input = do 
   C.CScreen screen <- A.get A.global
-
+  -- TODO: Handle level intro as well
   let switchInput 
         | NS.btnUp      input = if screen == C.Game     then C.Up      else C.None
         | NS.btnDown    input = if screen == C.Game     then C.Down    else C.None
