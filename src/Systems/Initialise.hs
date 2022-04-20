@@ -117,7 +117,7 @@ fillInnerArea = do
 setupScene :: C.System' ()
 setupScene = do 
   config     <- A.get A.global
-  graphics  <- A.get A.global
+  graphics   <- A.get A.global
   C.CLevel l <- A.get A.global
 
   (innerWalls, foods, enemies) <- A.liftIO $ setupScene' config graphics l

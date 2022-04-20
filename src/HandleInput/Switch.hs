@@ -175,9 +175,8 @@ readControllerInput :: NS.HasInput t => NS.Controller t -> Maybe (TBQ.TBQueue NS
 readControllerInput _ Nothing = return ()
 readControllerInput controller (Just queue) = forever $ do 
   ASTM.threadDelay 1000000
-  input <- A.liftIO $ NS.getInput controller 
-  A.liftIO $ print input -- VERBOSE
-  liftAtomically (TBQ.writeTBQueue queue input)
+  input <- A.liftIO $ NS.getTimeoutInput 1000 controller 
+  whenJust input (liftAtomically . TBQ.writeTBQueue queue)
 ----------------------------------------------------------------------------------------------
 
 
