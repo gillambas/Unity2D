@@ -10,9 +10,13 @@ import qualified Systems.Initialise as SInit
 import qualified Visualise.Draw     as Draw
 import qualified Visualise.Load     as Load
 
+import qualified Sound as Sound
 
 main :: IO ()
 main = do
+  Sound.withAudio $ do
+    Sound.playFile "assets/audio/dundundun.mp3"
+{-
   graphics <- Load.loadGraphics
 
   w <- C.initWorld
@@ -28,3 +32,4 @@ main = do
       Draw.draw
       EH.eventHandler
       Step.stepper
+-}

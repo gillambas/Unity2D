@@ -36,8 +36,12 @@ dependencies:
   - JuicyPixels
   - JuicyPixels-extra
   - linear
+  - monad-control
   - random
   - Rasterific
+  - sdl2
+  - sdl2-mixer
+
 
 library:
   source-dirs: src
